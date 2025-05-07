@@ -3,7 +3,6 @@ import {
   Box,
   Avatar,
   Text,
-  Input,
   HStack,
   VStack,
   IconButton,
@@ -12,82 +11,110 @@ import {
   Float,
   Circle,
 } from "@chakra-ui/react";
-import {
-  FaHeart,
-  FaRegComment,
-  FaPaperPlane,
-  FaBookmark,
-  FaEllipsisH,
-} from "react-icons/fa";
+import { FaHeart, FaBookmark, FaEllipsisH } from "react-icons/fa";
 import { getRelativeTime } from "../utils/getRelativeTime";
 
-import { Post } from "../data";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useUser } from "../context/UserContext";
 import { useEffect, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase"; // o da dove importi il db
 import { CommentDrawer } from "./CommentDrawer";
 import { ShareDrawer } from "./ShareDrawer";
-const HeartIcon = chakra(FaHeart  as any);
-const CommentIcon = chakra(FaRegComment  as any);
-const ShareIcon = chakra(FaPaperPlane  as any);
-const SaveIcon = chakra(FaBookmark  as any);
-const OptionsIcon = chakra(FaEllipsisH  as any);
-const PaperIcon = chakra(FaPaperPlane  as any);
+import { PostOptionsDrawer } from "./PostOptionsDrawer";
+import { VideoPlayer } from "./VideoPlayer";
+import { ZoomableImage } from "./ZoomableImage";
+const HeartIcon = chakra(FaHeart as any);
+const SaveIcon = chakra(FaBookmark as any);
+const OptionsIcon = chakra(FaEllipsisH as any);
 
-
-export const PostCard = ({ post,id }: { post: any,id:any }) => {
+export const PostCard = ({ post, id }: { post: any; id: any }) => {
   const functions = getFunctions();
-   const { user, profile, logout } = useUser();
-   const [liked, setLiked] = useState(false);
-const [likesCount, setLikesCount] = useState(post.likesCount);
-const [comment, setComment] = useState("");
-const addComment = httpsCallable(functions, "addComment");
-console.log(post)
+  const { user } = useUser();
+  const [liked, setLiked] = useState(false);
 
-useEffect(() => {
-  if (!user || !id) return;
+  const [isSaved, setIsSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const likeDocRef = doc(db, "posts", id, "likes", user.uid);
-  getDoc(likeDocRef).then((docSnap) => {
-    if (docSnap.exists()) {
-      setLiked(true);
+  const [liveLikes, setLiveLikes] = useState<number>(post.likesCount || 0);
+  const [isProcessingLike, setIsProcessingLike] = useState(false);
+
+  useEffect(() => {
+    if (!user || !id) return;
+    const savedRef = doc(db, "users", user.uid, "savedPosts", id);
+    getDoc(savedRef).then((docSnap) => {
+      if (docSnap.exists()) {
+        setIsSaved(true);
+      }
+    });
+  }, [user, id]);
+
+  useEffect(() => {
+    if (!id) return;
+    const unsub = onSnapshot(doc(db, "posts", id), (snap) => {
+      const data = snap.data();
+      if (data?.likesCount !== undefined) {
+        setLiveLikes(data.likesCount);
+      }
+    });
+    return () => unsub();
+  }, [id]);
+
+  useEffect(() => {
+    if (!user || !id) return;
+
+    const likeDocRef = doc(db, "posts", id, "likes", user.uid);
+    getDoc(likeDocRef).then((docSnap) => {
+      if (docSnap.exists()) {
+        setLiked(true);
+      }
+    });
+  }, [user, id]);
+
+  const toggleSave = async () => {
+    if (!user || saving) return;
+
+    const savePost = httpsCallable(functions, "savePost");
+    const unsavePost = httpsCallable(functions, "unsavePost");
+
+    setSaving(true);
+    try {
+      if (isSaved) {
+        await unsavePost({ postId: id });
+        setIsSaved(false);
+      } else {
+        await savePost({ postId: id });
+        setIsSaved(true);
+      }
+    } catch (err: any) {
+      console.error("Errore Firebase:", err.message || err);
+    } finally {
+      setSaving(false);
     }
-  });
-}, [user, id]);
-const handleSubmitComment = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!user || !comment.trim()) return;
+  };
 
-  try {
-    await addComment({ postId: id, text: comment });
-    setComment("");
-    // TODO: opzionalmente aggiorna la lista dei commenti
-  } catch (err) {
-    console.error("Errore invio commento:", err);
-  }
-};
-const handleLike = async () => {
-  if (!user) return alert("Devi essere loggato per mettere mi piace");
+  const handleLike = async () => {
+    if (!user || isProcessingLike) return;
 
-  const likePost = httpsCallable(functions, "likePost");
-  const unlikePost = httpsCallable(functions, "unlikePost");
+    setIsProcessingLike(true);
+    if (!user) return alert("Devi essere loggato per mettere mi piace");
 
+    const likePost = httpsCallable(functions, "likePost");
+    const unlikePost = httpsCallable(functions, "unlikePost");
 
-  try {
-    if (liked) {
-      await unlikePost({ postId: id });
-      setLikesCount((c: number) => c - 1);
-    } else {
-      await likePost({ postId: id });
-      setLikesCount((c: number) => c + 1);
+    try {
+      if (liked) {
+        await unlikePost({ postId: id });
+      } else {
+        await likePost({ postId: id });
+      }
+      setLiked(!liked);
+    } catch (err) {
+      console.error("Errore like:", err);
+    } finally {
+      setIsProcessingLike(false);
     }
-    setLiked(!liked);
-  } catch (err) {
-    console.error("Errore like:", err);
-  }
-};
+  };
   return (
     <Box
       borderRadius="md"
@@ -102,42 +129,28 @@ const handleLike = async () => {
       {/* Header */}
       <HStack justify="space-between" px={4} py={3}>
         <HStack>
-        <Avatar.Root colorPalette="green" variant="subtle">
-      <Avatar.Fallback name="Ciro Rivieccio" />
-      <Float placement="bottom-end" offsetX="1" offsetY="1">
-        <Circle
-          bg="green.500"
-          size="8px"
-          outline="0.2em solid"
-          outlineColor="bg"
-        />
-      </Float>
-    </Avatar.Root>
+          <Avatar.Root colorPalette="green" variant="subtle">
+            <Avatar.Fallback name="Ciro Rivieccio" />
+            <Float placement="bottom-end" offsetX="1" offsetY="1">
+              <Circle
+                bg="green.500"
+                size="8px"
+                outline="0.2em solid"
+                outlineColor="bg"
+              />
+            </Float>
+          </Avatar.Root>
           <Text fontWeight="bold">{post.title}</Text>
         </HStack>
-        <IconButton
-          aria-label="More"
-          variant="ghost"
-          size="sm"
-        
-        ><OptionsIcon /></IconButton>
+        <PostOptionsDrawer postId={id} isOwner={user?.uid === post.createdBy} />
       </HStack>
 
       {/* Media */}
       <Box w="100%" h="auto">
         {post.mediaType === "video" ? (
-          <chakra.video
-            src={post.mediaUrl}
-            controls
-            autoPlay
-            muted
-            loop
-            playsInline
-            w="100%"
-            objectFit="cover"
-          />
+          <VideoPlayer src={post.mediaUrl} width={"100%"} />
         ) : (
-          <Image src={post.mediaUrl} alt="Post" w="100%" objectFit="cover" />
+          <ZoomableImage src={post.mediaUrl} alt="Post"></ZoomableImage>
         )}
       </Box>
 
@@ -148,37 +161,38 @@ const handleLike = async () => {
             aria-label="Like"
             variant="ghost"
             onClick={handleLike}
-  disabled={!user}
+            disabled={!user || isProcessingLike}
+            size="sm"
+          >
+            {" "}
+            <HeartIcon color={liked ? "red.500" : "black"} />
+          </IconButton>
 
-            size="sm">     <HeartIcon color={liked ? "red.500" : "black"} /></IconButton>
-      
-      
-      <CommentDrawer postId={id} />
-      <ShareDrawer postUrl={`https://ciro-ig.web.app/posts/${id}`} />
-
+          <CommentDrawer postId={id} />
+          <ShareDrawer postUrl={`https://ciro-ig.web.app/posts/${id}`} />
         </HStack>
         <IconButton
-          aria-label="Save"
+          aria-label="Salva"
           variant="ghost"
           size="sm"
-       
-        ><SaveIcon /></IconButton>
+          onClick={toggleSave}
+          disabled={!user || saving}
+        >
+          <SaveIcon color={isSaved ? "blue.500" : "black"} />
+        </IconButton>
       </HStack>
 
       {/* Description */}
       <VStack px={4} align="start" gap={1} pb={3}>
         <Text fontWeight="bold" fontSize="sm">
-          {post.likesCount} Mi piace
+          {liveLikes} Mi piace
         </Text>
-        <Text fontSize="sm">
-         
-          {post.description}
-        </Text>
-     
-        <Text fontSize="xs" color="gray.500">
-  {post.createdAt?.seconds && getRelativeTime(new Date(post.createdAt.seconds * 1000))}
-</Text>
+        <Text fontSize="sm">{post.description}</Text>
 
+        <Text fontSize="xs" color="gray.500">
+          {post.createdAt?.seconds &&
+            getRelativeTime(new Date(post.createdAt.seconds * 1000))}
+        </Text>
       </VStack>
     </Box>
   );

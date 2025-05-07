@@ -22,6 +22,7 @@ export interface UserProfile {
   username: string;
   email: string;
   permissions: string;
+  verified: boolean;
 }
 
 // Tipi esposti dal Context
@@ -42,7 +43,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-
+  console.log(profile);
   // Sottoscrizione AuthState
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (usr) => {
@@ -52,6 +53,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         const ref = doc(db, "users", usr.uid);
         const snap = await getDoc(ref);
         if (snap.exists()) {
+          console.log(snap.data());
           setProfile(snap.data() as UserProfile);
         } else {
           setProfile(null);
@@ -82,6 +84,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       uid,
       username,
       email,
+      verified: false,
       permissions: "user",
     };
     await setDoc(doc(db, "users", uid), profileData);

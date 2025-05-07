@@ -18,6 +18,7 @@ import {
   Flex,
   Image,
   Icon,
+  Text,
 } from "@chakra-ui/react";
 import { LuFileImage, LuX } from "react-icons/lu";
 import { showToast } from "../components/Toaster"; // nostro toaster custom
@@ -44,6 +45,8 @@ export const CreatePostPage: React.FC = () => {
   const [uploading, setUploading] = useState(false);
   const [fileUrl, setFileUrl] = useState<string>("");
   const [fileBlob, setFileBlob] = useState<File | null>(null);
+  const [thumbnailBlob, setThumbnailBlob] = useState<File | null>(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string>("");
   // 1) Start the FileUpload store (max 1 file)
   // quando FileUpload.Root invoca onChange
 
@@ -55,6 +58,10 @@ export const CreatePostPage: React.FC = () => {
     }
     const url = URL.createObjectURL(fileBlob);
     setFileUrl(url);
+    if (fileBlob?.type?.startsWith("video/")) {
+      setThumbnailBlob(null);
+      setThumbnailUrl("");
+    }
     return () => {
       URL.revokeObjectURL(url);
       setFileUrl("");
@@ -101,7 +108,16 @@ export const CreatePostPage: React.FC = () => {
       );
       await uploadBytes(ref, fileBlob);
       const mediaUrl = await getDownloadURL(ref);
+      let finalThumbnailUrl = mediaUrl; // di default è l'immagine
 
+      if (isVideo && thumbnailBlob) {
+        const thumbRef = storageRef(
+          storage,
+          `posts/${user.uid}/thumb-${Date.now()}-${thumbnailBlob.name}`
+        );
+        await uploadBytes(thumbRef, thumbnailBlob);
+        finalThumbnailUrl = await getDownloadURL(thumbRef);
+      }
       await addDoc(collection(db, "posts"), {
         mediaUrl,
         mediaType: isVideo ? "video" : "image",
@@ -112,7 +128,7 @@ export const CreatePostPage: React.FC = () => {
         commentsCount: 0,
         createdBy: user.uid,
         createdAt: serverTimestamp(),
-        thumbnailUrl:"https://firebasestorage.googleapis.com/v0/b/ciro-ig.firebasestorage.app/o/profilo_insta_logo_2024_7f9c5c1b-e939-4c5d-8458-cbc3da978280.png?alt=media&token=7b365373-d93d-4594-bb09-89d8f5235ee3"
+        thumbnailUrl: finalThumbnailUrl,
       });
 
       showToast({ title: "Post creato!", status: "success" });
@@ -158,9 +174,64 @@ export const CreatePostPage: React.FC = () => {
                   <Icon as={LuFileIcon}></Icon>Seleziona file
                 </Button>
               </FileUpload.Trigger>
+              {fileBlob?.type.startsWith("video/") && (
+                <Field.Root required>
+                  <Field.Label>Anteprima del video</Field.Label>
+                  <FileUpload.Root
+                    accept="image/*"
+                    onFileAccept={({ files }: any) => {
+                      const f = files[0];
+                      setThumbnailBlob(f);
+                      const url = URL.createObjectURL(f);
+                      setThumbnailUrl(url);
+                    }}
+                  >
+                    <FileUpload.HiddenInput />
+                    <FileUpload.Trigger asChild>
+                      <Button variant="outline" size="md">
+                        <Icon as={LuFileIcon} /> Seleziona immagine
+                      </Button>
+                    </FileUpload.Trigger>
+                    {fileBlob && (
+                      <Box
+                        mt={3}
+                        p={3}
+                        borderWidth="1px"
+                        borderRadius="md"
+                        bg="gray.50"
+                        fontSize="sm"
+                        textAlign="left"
+                        wordBreak="break-all"
+                      >
+                        <Text>
+                          {fileBlob.type.startsWith("video/")
+                            ? "🎥 Video:"
+                            : "🖼️ Immagine:"}{" "}
+                          <strong>{fileBlob.name}</strong>
+                        </Text>
+                        <Text color="gray.500" fontSize="xs">
+                          {Math.round(fileBlob.size / 1024)} KB
+                        </Text>
+                      </Box>
+                    )}
+                  </FileUpload.Root>
+
+                  {thumbnailUrl && (
+                    <Image
+                      src={thumbnailUrl}
+                      alt="Anteprima Thumbnail"
+                      boxSize="150px"
+                      mt={3}
+                      borderRadius="md"
+                      objectFit="cover"
+                      mx="auto"
+                    />
+                  )}
+                </Field.Root>
+              )}
 
               {/* preview + delete automatici */}
-              {fileUrl && (
+              {fileUrl && !fileBlob?.type.startsWith("video/") && (
                 <Image
                   src={fileUrl}
                   alt="Anteprima"

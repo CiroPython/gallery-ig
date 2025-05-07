@@ -18,7 +18,11 @@ import { CreatePostPage } from "./pages/CreatePostPage";
 import PostPage from "./pages/PostPage";
 import { InstallBanner } from "./components/InstallBanner";
 import { IosInstallBanner } from "./components/IosInstallBanner";
-
+import { SavedPostsPage } from "./pages/SavedPostsPage";
+import { ProfilePage } from "./pages/ProfilePage";
+import { EditProfilePage } from "./pages/EditProfilePage";
+import { EditPostPage } from "./pages/EditPostPage";
+import { VerificationRequestsPage } from "./pages/VerificationRequestsPage";
 
 function App() {
   return (
@@ -38,7 +42,15 @@ function App() {
               <Route path="/login" element={<AuthPage />} />
               <Route path="/register" element={<AuthPage />} />
               <Route path="/createpost" element={<CreatePostPage />} />
-              <Route path="/post/:id" element={<PostPage/>} />
+              <Route path="/post/:id" element={<PostPage />} />
+              <Route path="/saved" element={<SavedPostsPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/profile/edit" element={<EditProfilePage />} />
+              <Route path="/post/:id/edit" element={<EditPostPage />} />
+              <Route
+                path="/admin/requests"
+                element={<VerificationRequestsPage />}
+              />
               {/* Redirect per qualsiasi altra rotta */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

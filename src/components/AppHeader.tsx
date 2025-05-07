@@ -11,21 +11,26 @@ import {
   useBreakpointValue,
 } from "@chakra-ui/react";
 import { BiHomeAlt, BiSearch, BiX } from "react-icons/bi";
-import { FaUser } from "react-icons/fa";
+import { FaBookmark, FaRegBookmark, FaUser } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
+import { FaUserCog } from "react-icons/fa";
 
 import { AiOutlinePlusSquare, AiOutlineHeart } from "react-icons/ai";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { Button, CloseButton, Dialog, Portal } from "@chakra-ui/react";
+import { FaRegCircleUser, FaRegRectangleList } from "react-icons/fa6";
 // Wrappiamo le react-icons
 const HomeIcon = chakra(BiHomeAlt as any);
 const AddIcon = chakra(AiOutlinePlusSquare as any);
-const HeartIcon = chakra(AiOutlineHeart as any);
+const ListIcon = chakra(FaRegRectangleList as any);
+
+const HeartIcon = chakra(FaRegBookmark as any);
 const SearchIcon = chakra(BiSearch as any);
 const CloseIcon = chakra(BiX as any);
 const AvatarIcon = chakra(FaUser as any);
+const EditIcon = chakra(FaRegCircleUser as any);
 const LogoutIcon = chakra(FiLogOut as any);
 export const AppHeader: React.FC = () => {
   const navigate = useNavigate();
@@ -52,85 +57,51 @@ export const AppHeader: React.FC = () => {
       zIndex="100"
     >
       {/* Logo */}
-      <Box   
-      onClick={()=> navigate("/")}>
-      <Image
-        src={logo}
-        alt="Logo"
-        boxSize={{ base: "46px", md: "50px" }}
-        objectFit="contain"
-        draggable={false}
-     
-      />
-</Box>
-      {/* --- Sezione ricerca --- */}
-      {showFullNav ? (
-        // desktop / tablet
-        <Box mx="auto" maxW="300px" w="100%">
-          <Input
-            placeholder="Search"
-            size="sm"
-            variant="subtle"
-            bg="gray.100"
-            _placeholder={{ color: "gray.500" }}
-          />
-        </Box>
-      ) : mobileSearch ? (
-        // mobile: campo di ricerca aperto
-        <Box flex="1" ml={2} position="relative">
-          <Input
-            placeholder="Search"
-            size="sm"
-            variant="subtle"
-            bg="gray.100"
-            _placeholder={{ color: "gray.500" }}
-          />
-          <IconButton
-            aria-label="Chiudi ricerca"
-            variant="ghost"
-            size="sm"
-            position="absolute"
-            top="50%"
-            right="4px"
-            transform="translateY(-50%)"
-            onClick={() => setMobileSearch(false)}
-          >
-            <CloseIcon boxSize={5} />
-          </IconButton>
-        </Box>
-      ) : (
-        // mobile: icona lente
-        <IconButton
-          aria-label="Search"
-          variant="ghost"
-          size="md"
-          ml="auto"
-          onClick={() => setMobileSearch(true)}
-        >
-          <SearchIcon boxSize={8} />
-        </IconButton>
-      )}
+      <Box onClick={() => navigate("/")}>
+        <Image
+          src={logo}
+          alt="Logo"
+          boxSize={{ base: "46px", md: "50px" }}
+          objectFit="contain"
+          draggable={false}
+        />
+      </Box>
 
       {/* --- Icone di navigazione --- */}
-      <HStack gap={{ base: 1, md: 2 }} ml={{ base: 0, md: 4 }}>
+      <HStack gap={{ base: 0, md: 2 }} ml="auto">
         {profile?.permissions === "admin" ? (
+          <IconButton
+            onClick={() => navigate("/admin/requests")}
+            aria-label="Add"
+            variant="ghost"
+            size="md"
+          >
+            <ListIcon boxSize={6} />
+          </IconButton>
+        ) : null}
+        {profile?.permissions === "admin" || profile?.verified === true ? (
           <IconButton
             onClick={() => navigate("/createpost")}
             aria-label="Add"
             variant="ghost"
             size="md"
           >
-            <AddIcon boxSize={8} />
+            <AddIcon boxSize={6} />
           </IconButton>
         ) : null}
-        {showFullNav && (
-          <>
-               {profile?.uid ? 
-            <IconButton aria-label="Likes" variant="ghost" size="md">
-              <HeartIcon boxSize={8} />
-            </IconButton> : null}
-          </>
-        )}
+        <>
+          {profile?.uid ? (
+            <IconButton
+              onClick={() => navigate("/saved")}
+              aria-label="Likes"
+              variant="ghost"
+              size="md"
+            >
+              <HeartIcon boxSize={5} />
+            </IconButton>
+          ) : null}
+        </>
+
         {tryLogout ? (
           <Dialog.Root
             lazyMount
@@ -170,14 +141,24 @@ export const AppHeader: React.FC = () => {
         ) : null}
         {/* Avatar profilo */}
         {user ? (
-          <IconButton
-            onClick={() => setTryLogout(true)}
-            aria-label="User"
-            variant="ghost"
-            size="md"
-          >
-            <LogoutIcon boxSize={7} />
-          </IconButton>
+          <>
+            <IconButton
+              onClick={() => navigate("/profile")}
+              aria-label="User"
+              variant="ghost"
+              size="md"
+            >
+              <EditIcon boxSize={5} />
+            </IconButton>
+            <IconButton
+              onClick={() => setTryLogout(true)}
+              aria-label="User"
+              variant="ghost"
+              size="md"
+            >
+              <LogoutIcon boxSize={6} />
+            </IconButton>
+          </>
         ) : (
           <IconButton
             onClick={() => navigate("/login")}

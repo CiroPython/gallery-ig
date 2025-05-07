@@ -90,6 +90,7 @@ export const AuthPage: React.FC = () => {
         username: regUsername,
         email: regEmail,
         permissions: "user",
+        verified: false,
       });
 
       showToast({
@@ -111,128 +112,127 @@ export const AuthPage: React.FC = () => {
 
   return (
     <Center minH="100vh" w="100%" bg="#fafafa" p={4}>
-  <VStack gap={4} w="full" maxW="400px">
-    {/* Card principale */}
-    <Box
-      w="full"
-      bg="white"
-      p={{ base: 6, md: 10 }}
-      rounded="2xl"
-      boxShadow="lg"
-    >
-      <VStack gap={6}>
-        <Image src={logo} alt="Logo" boxSize="100px" />
+      <VStack gap={4} w="full" maxW="400px">
+        {/* Card principale */}
+        <Box
+          w="full"
+          bg="white"
+          p={{ base: 6, md: 10 }}
+          rounded="2xl"
+          boxShadow="lg"
+        >
+          <VStack gap={6}>
+            <Image src={logo} alt="Logo" boxSize="100px" />
 
-        {/* Form login o register */}
-        {!isRegister ? (
-          <>
-            <Input
-              placeholder="Email"
-              type="email"
-              value={loginEmail}
-              onChange={(e) => setLoginEmail(e.target.value)}
-              size="lg"
-              rounded="md"
-              bg="gray.100"
-            />
-            <Input
-              placeholder="Password"
-              type="password"
-              value={loginPassword}
-              onChange={(e) => setLoginPassword(e.target.value)}
-              size="lg"
-              rounded="md"
-              bg="gray.100"
-            />
-            <Button
-              w="full"
-              colorScheme="blue"
-              size="lg"
-              onClick={handleLogin}
-              loading={loading}
-              loadingText="Accedi"
-            >
-              Accedi
-            </Button>
+            {/* Form login o register */}
+            {!isRegister ? (
+              <>
+                <Input
+                  placeholder="Email"
+                  type="email"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  size="lg"
+                  rounded="md"
+                  bg="gray.100"
+                />
+                <Input
+                  placeholder="Password"
+                  type="password"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  size="lg"
+                  rounded="md"
+                  bg="gray.100"
+                />
+                <Button
+                  w="full"
+                  colorScheme="blue"
+                  size="lg"
+                  onClick={handleLogin}
+                  loading={loading}
+                  loadingText="Accedi"
+                >
+                  Accedi
+                </Button>
 
-            <Link color="blue.500" fontSize="sm">
-              Password dimenticata?
-            </Link>
-          </>
-        ) : (
-          <>
-            <Input
-              placeholder="Username"
-              value={regUsername}
-              onChange={(e) => setRegUsername(e.target.value)}
-              size="lg"
-              rounded="md"
-              bg="gray.100"
-            />
-            <Input
-              placeholder="Email"
-              type="email"
-              value={regEmail}
-              onChange={(e) => setRegEmail(e.target.value)}
-              size="lg"
-              rounded="md"
-              bg="gray.100"
-            />
-            <Input
-              placeholder="Password"
-              type="password"
-              value={regPassword}
-              onChange={(e) => setRegPassword(e.target.value)}
-              size="lg"
-              rounded="md"
-              bg="gray.100"
-            />
-            <Input
-              placeholder="Conferma Password"
-              type="password"
-              value={regConfirm}
-              onChange={(e) => setRegConfirm(e.target.value)}
-              size="lg"
-              rounded="md"
-              bg="gray.100"
-            />
-            <Button
-              w="full"
-              colorScheme="green"
-              size="lg"
-              onClick={handleRegister}
-              loading={loading}
-              loadingText="Iscrizione..."
-            >
-              Iscriviti
-            </Button>
-          </>
-        )}
+                <Link color="blue.500" fontSize="sm">
+                  Password dimenticata?
+                </Link>
+              </>
+            ) : (
+              <>
+                <Input
+                  placeholder="Username"
+                  value={regUsername}
+                  onChange={(e) => setRegUsername(e.target.value)}
+                  size="lg"
+                  rounded="md"
+                  bg="gray.100"
+                />
+                <Input
+                  placeholder="Email"
+                  type="email"
+                  value={regEmail}
+                  onChange={(e) => setRegEmail(e.target.value)}
+                  size="lg"
+                  rounded="md"
+                  bg="gray.100"
+                />
+                <Input
+                  placeholder="Password"
+                  type="password"
+                  value={regPassword}
+                  onChange={(e) => setRegPassword(e.target.value)}
+                  size="lg"
+                  rounded="md"
+                  bg="gray.100"
+                />
+                <Input
+                  placeholder="Conferma Password"
+                  type="password"
+                  value={regConfirm}
+                  onChange={(e) => setRegConfirm(e.target.value)}
+                  size="lg"
+                  rounded="md"
+                  bg="gray.100"
+                />
+                <Button
+                  w="full"
+                  colorScheme="green"
+                  size="lg"
+                  onClick={handleRegister}
+                  loading={loading}
+                  loadingText="Iscrizione..."
+                >
+                  Iscriviti
+                </Button>
+              </>
+            )}
+          </VStack>
+        </Box>
+
+        {/* Card bottom per switch login/register */}
+        <Box w="full" bg="white" p={4} rounded="xl" boxShadow="md">
+          <Text textAlign="center" fontSize="md">
+            {!isRegister ? (
+              <>
+                Non hai un account?{" "}
+                <Link color="blue.500" onClick={() => setIsRegister(true)}>
+                  Iscriviti
+                </Link>
+              </>
+            ) : (
+              <>
+                Hai già un account?{" "}
+                <Link color="blue.500" onClick={() => setIsRegister(false)}>
+                  Accedi
+                </Link>
+              </>
+            )}
+          </Text>
+        </Box>
       </VStack>
-    </Box>
-
-    {/* Card bottom per switch login/register */}
-    <Box w="full" bg="white" p={4} rounded="xl" boxShadow="md">
-      <Text textAlign="center" fontSize="md">
-        {!isRegister ? (
-          <>
-            Non hai un account?{" "}
-            <Link color="blue.500" onClick={() => setIsRegister(true)}>
-              Iscriviti
-            </Link>
-          </>
-        ) : (
-          <>
-            Hai già un account?{" "}
-            <Link color="blue.500" onClick={() => setIsRegister(false)}>
-              Accedi
-            </Link>
-          </>
-        )}
-      </Text>
-    </Box>
-  </VStack>
-</Center>
-
+    </Center>
   );
 };

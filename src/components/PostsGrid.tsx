@@ -20,8 +20,8 @@ import { useNavigate } from "react-router-dom";
 import { collection, query, onSnapshot, orderBy } from "firebase/firestore";
 import { db } from "../firebase";
 const LockIcon = chakra(FaLock as any);
-const VideoIcon=chakra(FaVideo as any);
-const ImageIcon=chakra(FaImage as any);
+const VideoIcon = chakra(FaVideo as any);
+const ImageIcon = chakra(FaImage as any);
 
 const Video = chakra("video");
 export const PostsGrid: React.FC = () => {
@@ -39,11 +39,11 @@ export const PostsGrid: React.FC = () => {
           id: d.id,
           mediaUrl: data.mediaUrl,
           isGated: data.isGated,
-          mediaType: data.mediaType, 
-          thumbnailUrl: data.thumbnailUrl, 
-          description:data.description,
-          title:data.title,
-          likesCount:data.likesCount
+          mediaType: data.mediaType,
+          thumbnailUrl: data.thumbnailUrl,
+          description: data.description,
+          title: data.title,
+          likesCount: data.likesCount,
         } as Post;
       });
       setPosts(docs);
@@ -67,52 +67,50 @@ export const PostsGrid: React.FC = () => {
       gap={{ base: 1, sm: 2, md: 4 }}
       p={4}
     >
-      {posts.map((post: Post) => (
+      {posts.map((post) => (
         <Box
           key={post.id}
-          position="relative"
           cursor="pointer"
-          onClick={()=> navigate(`/post/${post.id}`)}
+          onClick={() => navigate(`/post/${post.id}`)}
         >
-          {post.mediaType === "video" ? (<>
-      <Center position="absolute" inset="0" bg="rgba(0,0,0,0.5)">
-      <VideoIcon boxSize={8} color="white" />
-    </Center>
-    <Image
-              src={post.thumbnailUrl}
-              alt=""
-              style={{
-                objectFit: "contain",
-                width: "100%",
-                height: "100%",
-                display: "block",
-              
-              }}
-            />
-        </>
-          ) : (
-            <>
-            <Center position="absolute" inset="0" bg="rgba(0,0,0,0.5)">
-            <ImageIcon boxSize={8} color="white" />
-          </Center>
-            <Image
-              src={post.mediaUrl}
-              alt=""
-              style={{
-                objectFit: "contain",
-                width: "100%",
-                height: "100%",
-                display: "block",
-              }}
-            />
-            </>
-          )}
+          <AspectRatio ratio={1} w="100%">
+            <Box position="relative" w="full" h="full">
+              <Image
+                src={
+                  post.mediaType === "video" ? post.thumbnailUrl : post.mediaUrl
+                }
+                alt="Post media"
+                w="100%"
+                h="100%"
+                objectFit="cover"
+              />
 
-          {post.isGated && !user ? (
-            <Center position="absolute" top="5" inset="0" bg="rgba(0,0,0,0.5)">
-              <LockIcon boxSize={10} color="white" />
-            </Center>
-          ) : null}
+              <Center position="absolute" inset="0" zIndex={2}>
+                {post.mediaType === "video" ? (
+                  <VideoIcon boxSize={6} color="white" />
+                ) : (
+                  <ImageIcon boxSize={6} color="white" />
+                )}
+              </Center>
+              {/* Overlay grigio trasparente */}
+              <Box
+                position="absolute"
+                inset="0"
+                bg="blackAlpha.400" // grigio scuro trasparente
+                zIndex={1}
+              />
+              {post.isGated && !user && (
+                <Center
+                  position="absolute"
+                  inset="0"
+                  bg="rgba(0,0,0,0.5)"
+                  zIndex={3}
+                >
+                  <LockIcon boxSize={10} color="white" />
+                </Center>
+              )}
+            </Box>
+          </AspectRatio>
         </Box>
       ))}
     </SimpleGrid>
