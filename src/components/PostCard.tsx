@@ -28,6 +28,7 @@ import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase"; // o da dove importi il db
 import { CommentDrawer } from "./CommentDrawer";
+import { ShareDrawer } from "./ShareDrawer";
 const HeartIcon = chakra(FaHeart  as any);
 const CommentIcon = chakra(FaRegComment  as any);
 const ShareIcon = chakra(FaPaperPlane  as any);
@@ -153,12 +154,8 @@ const handleLike = async () => {
       
       
       <CommentDrawer postId={id} />
-          <IconButton
-            aria-label="Share"
-            variant="ghost"
-            size="sm"
-            
-          ><ShareIcon /></IconButton>
+      <ShareDrawer postUrl={`https://ciro-ig.web.app/posts/${id}`} />
+
         </HStack>
         <IconButton
           aria-label="Save"
