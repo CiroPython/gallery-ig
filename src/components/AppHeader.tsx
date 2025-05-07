@@ -34,7 +34,7 @@ export const AppHeader: React.FC = () => {
   // stato per ricerca mobile
   const [mobileSearch, setMobileSearch] = useState(false);
   const { user, profile, logout } = useUser();
-  console.log(profile);
+
   const [tryLogout, setTryLogout] = useState(false);
   return (
     <Flex
@@ -52,14 +52,17 @@ export const AppHeader: React.FC = () => {
       zIndex="100"
     >
       {/* Logo */}
+      <Box   
+      onClick={()=> navigate("/")}>
       <Image
         src={logo}
         alt="Logo"
         boxSize={{ base: "46px", md: "50px" }}
         objectFit="contain"
         draggable={false}
+     
       />
-
+</Box>
       {/* --- Sezione ricerca --- */}
       {showFullNav ? (
         // desktop / tablet
@@ -110,14 +113,6 @@ export const AppHeader: React.FC = () => {
 
       {/* --- Icone di navigazione --- */}
       <HStack gap={{ base: 1, md: 2 }} ml={{ base: 0, md: 4 }}>
-        <IconButton
-          onClick={() => navigate("/")}
-          aria-label="Home"
-          variant="ghost"
-          size="md"
-        >
-          <HomeIcon boxSize={8} />
-        </IconButton>
         {profile?.permissions === "admin" ? (
           <IconButton
             onClick={() => navigate("/createpost")}
@@ -130,9 +125,10 @@ export const AppHeader: React.FC = () => {
         ) : null}
         {showFullNav && (
           <>
+               {profile?.uid ? 
             <IconButton aria-label="Likes" variant="ghost" size="md">
               <HeartIcon boxSize={8} />
-            </IconButton>
+            </IconButton> : null}
           </>
         )}
         {tryLogout ? (

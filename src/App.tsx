@@ -15,6 +15,10 @@ import { AuthPage } from "./pages/AuthPage";
 import { ToastProvider } from "@chakra-ui/toast";
 import { UserProvider } from "./context/UserContext";
 import { CreatePostPage } from "./pages/CreatePostPage";
+import PostPage from "./pages/PostPage";
+import { InstallBanner } from "./components/InstallBanner";
+import { IosInstallBanner } from "./components/IosInstallBanner";
+
 
 function App() {
   return (
@@ -25,7 +29,7 @@ function App() {
           <AppHeader />
 
           {/* Spazio in cima per non far scorrere il contenuto sotto l’header */}
-          <Box pt={{ base: "36px", md: "50px" }}>
+          <Box pt={{ base: "56px", md: "50px" }}>
             <Routes>
               {/* Home / Landing */}
               <Route path="/" element={<LandingPage />} />
@@ -34,10 +38,13 @@ function App() {
               <Route path="/login" element={<AuthPage />} />
               <Route path="/register" element={<AuthPage />} />
               <Route path="/createpost" element={<CreatePostPage />} />
+              <Route path="/post/:id" element={<PostPage/>} />
               {/* Redirect per qualsiasi altra rotta */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Box>
+          <InstallBanner />
+          <IosInstallBanner />
         </BrowserRouter>
         <ToastProvider /> {/* ← monta qui il container */}
       </UserProvider>

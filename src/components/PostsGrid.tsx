@@ -7,15 +7,22 @@ import {
   Center,
   chakra,
   Spinner,
+  AspectRatio,
 } from "@chakra-ui/react";
 import type { Post } from "../data";
 
 import { FaLock } from "react-icons/fa";
+import { FaVideo } from "react-icons/fa";
+import { FaImage } from "react-icons/fa6";
+
 import { useUser } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { collection, query, onSnapshot, orderBy } from "firebase/firestore";
 import { db } from "../firebase";
 const LockIcon = chakra(FaLock as any);
+const VideoIcon=chakra(FaVideo as any);
+const ImageIcon=chakra(FaImage as any);
+
 const Video = chakra("video");
 export const PostsGrid: React.FC = () => {
   const { user, loading: authLoading, profile } = useUser();
@@ -32,6 +39,11 @@ export const PostsGrid: React.FC = () => {
           id: d.id,
           mediaUrl: data.mediaUrl,
           isGated: data.isGated,
+          mediaType: data.mediaType, 
+          thumbnailUrl: data.thumbnailUrl, 
+          description:data.description,
+          title:data.title,
+          likesCount:data.likesCount
         } as Post;
       });
       setPosts(docs);
@@ -60,29 +72,29 @@ export const PostsGrid: React.FC = () => {
           key={post.id}
           position="relative"
           cursor="pointer"
-          onClick={() => {
-            if (post.isGated && !user) {
-              return;
-            } else {
-              navigate(`/post/${post.id}`);
-            }
-          }}
+          onClick={()=> navigate(`/post/${post.id}`)}
         >
-          {post.mediaType === "video" ? (
-            <Video
-              src={post.mediaUrl}
-              autoPlay
-              muted
-              loop
-              playsInline
+          {post.mediaType === "video" ? (<>
+      <Center position="absolute" inset="0" bg="rgba(0,0,0,0.5)">
+      <VideoIcon boxSize={8} color="white" />
+    </Center>
+    <Image
+              src={post.thumbnailUrl}
+              alt=""
               style={{
                 objectFit: "contain",
                 width: "100%",
                 height: "100%",
                 display: "block",
+              
               }}
             />
+        </>
           ) : (
+            <>
+            <Center position="absolute" inset="0" bg="rgba(0,0,0,0.5)">
+            <ImageIcon boxSize={8} color="white" />
+          </Center>
             <Image
               src={post.mediaUrl}
               alt=""
@@ -93,11 +105,12 @@ export const PostsGrid: React.FC = () => {
                 display: "block",
               }}
             />
+            </>
           )}
 
           {post.isGated && !user ? (
-            <Center position="absolute" inset="0" bg="rgba(0,0,0,0.5)">
-              <LockIcon boxSize={6} color="white" />
+            <Center position="absolute" top="5" inset="0" bg="rgba(0,0,0,0.5)">
+              <LockIcon boxSize={10} color="white" />
             </Center>
           ) : null}
         </Box>

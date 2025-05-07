@@ -112,6 +112,7 @@ export const CreatePostPage: React.FC = () => {
         commentsCount: 0,
         createdBy: user.uid,
         createdAt: serverTimestamp(),
+        thumbnailUrl:"https://firebasestorage.googleapis.com/v0/b/ciro-ig.firebasestorage.app/o/profilo_insta_logo_2024_7f9c5c1b-e939-4c5d-8458-cbc3da978280.png?alt=media&token=7b365373-d93d-4594-bb09-89d8f5235ee3"
       });
 
       showToast({ title: "Post creato!", status: "success" });
