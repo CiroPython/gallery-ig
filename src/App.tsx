@@ -1,5 +1,5 @@
 // src/App.tsx
-import React from "react";
+import React, { useEffect } from "react";
 import {
   ChakraProvider,
   defaultSystem,
@@ -23,8 +23,16 @@ import { ProfilePage } from "./pages/ProfilePage";
 import { EditProfilePage } from "./pages/EditProfilePage";
 import { EditPostPage } from "./pages/EditPostPage";
 import { VerificationRequestsPage } from "./pages/VerificationRequestsPage";
+import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
 
 function App() {
+    // 🔥 Hack iOS PWA:
+    useEffect(() => {
+      const noop = () => { /* just a dummy touch listener */ };
+      // listener NON-passive per sbloccare focus/input su iOS PWA
+      document.addEventListener("touchstart", noop, false);
+      return () => document.removeEventListener("touchstart", noop);
+    }, []);
   return (
     <ChakraProvider value={defaultSystem}>
       <UserProvider>
@@ -44,9 +52,10 @@ function App() {
               <Route path="/createpost" element={<CreatePostPage />} />
               <Route path="/post/:id" element={<PostPage />} />
               <Route path="/saved" element={<SavedPostsPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/profile/:id" element={<ProfilePage />} />
               <Route path="/profile/edit" element={<EditProfilePage />} />
               <Route path="/post/:id/edit" element={<EditPostPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route
                 path="/admin/requests"
                 element={<VerificationRequestsPage />}

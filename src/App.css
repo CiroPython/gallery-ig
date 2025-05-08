@@ -36,3 +36,12 @@
     transform: rotate(360deg);
   }
 }
+/* forza 16px e touch-action su tutti gli input, textarea, select e button */
+input,
+textarea,
+select,
+button {
+  font-size: 16px !important;         /* evita zoom iOS su input più piccoli */
+  touch-action: manipulation !important; /* migliora il tap responsiveness */
+  -webkit-user-select: text !important; /* assicura che il testo sia selezionabile */
+}

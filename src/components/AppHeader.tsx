@@ -64,6 +64,15 @@ export const AppHeader: React.FC = () => {
           boxSize={{ base: "46px", md: "50px" }}
           objectFit="contain"
           draggable={false}
+          _hover={{
+            bg:  "red.100",
+            color: "red.600" ,
+          }}
+          _active={{
+            transform: "scale(0.8)",
+            color: "red.600" ,
+          }}
+          transition="all 0.2s"
         />
       </Box>
 
@@ -75,6 +84,15 @@ export const AppHeader: React.FC = () => {
             aria-label="Add"
             variant="ghost"
             size="md"
+            _hover={{
+              bg:  "red.100",
+              color: "red.600" ,
+            }}
+            _active={{
+              transform: "scale(0.8)",
+              color: "red.600" ,
+            }}
+            transition="all 0.2s"
           >
             <ListIcon boxSize={6} />
           </IconButton>
@@ -85,6 +103,15 @@ export const AppHeader: React.FC = () => {
             aria-label="Add"
             variant="ghost"
             size="md"
+            _hover={{
+              bg:  "red.100",
+              color: "red.600" ,
+            }}
+            _active={{
+              transform: "scale(0.8)",
+              color: "red.600" ,
+            }}
+            transition="all 0.2s"
           >
             <AddIcon boxSize={6} />
           </IconButton>
@@ -96,6 +123,15 @@ export const AppHeader: React.FC = () => {
               aria-label="Likes"
               variant="ghost"
               size="md"
+              _hover={{
+                bg:  "red.100",
+                color: "red.600" ,
+              }}
+              _active={{
+                transform: "scale(0.8)",
+                color: "red.600" ,
+              }}
+              transition="all 0.2s"
             >
               <HeartIcon boxSize={5} />
             </IconButton>
@@ -143,10 +179,19 @@ export const AppHeader: React.FC = () => {
         {user ? (
           <>
             <IconButton
-              onClick={() => navigate("/profile")}
+              onClick={() => navigate(`/profile/${profile?.uid}`)}
               aria-label="User"
               variant="ghost"
               size="md"
+              _hover={{
+                bg:  "red.100",
+                color: "red.600" ,
+              }}
+              _active={{
+                transform: "scale(0.8)",
+                color: "red.600" ,
+              }}
+              transition="all 0.2s"
             >
               <EditIcon boxSize={5} />
             </IconButton>
@@ -155,6 +200,15 @@ export const AppHeader: React.FC = () => {
               aria-label="User"
               variant="ghost"
               size="md"
+              _hover={{
+                bg:  "red.100",
+                color: "red.600" ,
+              }}
+              _active={{
+                transform: "scale(0.8)",
+                color: "red.600" ,
+              }}
+              transition="all 0.2s"
             >
               <LogoutIcon boxSize={6} />
             </IconButton>
@@ -165,6 +219,15 @@ export const AppHeader: React.FC = () => {
             aria-label="User"
             variant="ghost"
             size="md"
+            _hover={{
+              bg:  "red.100",
+              color: "red.600" ,
+            }}
+            _active={{
+              transform: "scale(0.8)",
+              color: "red.600" ,
+            }}
+            transition="all 0.2s"
           >
             <AvatarIcon />
           </IconButton>

@@ -146,14 +146,7 @@ export const CreatePostPage: React.FC = () => {
   };
 
   return (
-    <Flex
-      w="full"
-      align="center"
-      justify="center"
-      bg="gray.50"
-      minH="100vh"
-      p={4}
-    >
+    <Box maxW="md" mx="auto" py={6} px={4} mt={"8em"}>
       <Box w="full" maxW="md" bg="white" p={6} boxShadow="md" borderRadius="lg">
         <VStack gap={4} align="stretch">
           <Heading size="md" textAlign="center">
@@ -162,7 +155,7 @@ export const CreatePostPage: React.FC = () => {
 
           {/* Upload immagine/video */}
           <Field.Root>
-            <Field.Label>Immagine o Video</Field.Label>
+            <Field.Label>Immagine o Video *</Field.Label>
 
             <FileUpload.Root
               accept="image/*,video/*"
@@ -174,25 +167,7 @@ export const CreatePostPage: React.FC = () => {
                   <Icon as={LuFileIcon}></Icon>Seleziona file
                 </Button>
               </FileUpload.Trigger>
-              {fileBlob?.type.startsWith("video/") && (
-                <Field.Root required>
-                  <Field.Label>Anteprima del video</Field.Label>
-                  <FileUpload.Root
-                    accept="image/*"
-                    onFileAccept={({ files }: any) => {
-                      const f = files[0];
-                      setThumbnailBlob(f);
-                      const url = URL.createObjectURL(f);
-                      setThumbnailUrl(url);
-                    }}
-                  >
-                    <FileUpload.HiddenInput />
-                    <FileUpload.Trigger asChild>
-                      <Button variant="outline" size="md">
-                        <Icon as={LuFileIcon} /> Seleziona immagine
-                      </Button>
-                    </FileUpload.Trigger>
-                    {fileBlob && (
+              {fileBlob && (
                       <Box
                         mt={3}
                         p={3}
@@ -214,6 +189,26 @@ export const CreatePostPage: React.FC = () => {
                         </Text>
                       </Box>
                     )}
+              {fileBlob?.type.startsWith("video/") && (
+                <Field.Root required>
+                  <Field.Label>Anteprima del video *</Field.Label>
+                  <FileUpload.Root
+                    accept="image/*"
+                    onFileAccept={({ files }: any) => {
+                      const f = files[0];
+                      setThumbnailBlob(f);
+                      const url = URL.createObjectURL(f);
+                      setThumbnailUrl(url);
+                    }}
+                  >
+                    <FileUpload.HiddenInput />
+                    
+                    <FileUpload.Trigger asChild>
+                      <Button variant="outline" size="md">
+                        <Icon as={LuFileIcon} /> Seleziona immagine
+                      </Button>
+                    </FileUpload.Trigger>
+             
                   </FileUpload.Root>
 
                   {thumbnailUrl && (
@@ -247,7 +242,7 @@ export const CreatePostPage: React.FC = () => {
 
           {/* Titolo */}
           <Field.Root required>
-            <Field.Label>Titolo</Field.Label>
+            <Field.Label>Titolo *</Field.Label>
             <Input
               placeholder="Titolo del post"
               value={title}
@@ -257,7 +252,7 @@ export const CreatePostPage: React.FC = () => {
 
           {/* Descrizione */}
           <Field.Root>
-            <Field.Label>Descrizione</Field.Label>
+            <Field.Label>Descrizione *</Field.Label>
             <Textarea
               placeholder="Descrivi il post…"
               value={description}
@@ -290,6 +285,6 @@ export const CreatePostPage: React.FC = () => {
           </Button>
         </VStack>
       </Box>
-    </Flex>
+    </Box>
   );
 };

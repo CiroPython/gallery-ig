@@ -10,8 +10,9 @@ import {
   chakra,
   Float,
   Circle,
+  Center,
 } from "@chakra-ui/react";
-import { FaHeart, FaBookmark, FaEllipsisH } from "react-icons/fa";
+import { FaHeart, FaBookmark, FaEllipsisH, FaLock } from "react-icons/fa";
 import { getRelativeTime } from "../utils/getRelativeTime";
 
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -27,7 +28,7 @@ import { ZoomableImage } from "./ZoomableImage";
 const HeartIcon = chakra(FaHeart as any);
 const SaveIcon = chakra(FaBookmark as any);
 const OptionsIcon = chakra(FaEllipsisH as any);
-
+const LockIcon = chakra(FaLock as any);
 export const PostCard = ({ post, id }: { post: any; id: any }) => {
   const functions = getFunctions();
   const { user } = useUser();
@@ -35,7 +36,7 @@ export const PostCard = ({ post, id }: { post: any; id: any }) => {
 
   const [isSaved, setIsSaved] = useState(false);
   const [saving, setSaving] = useState(false);
-
+  const [authorData, setAuthorData] = useState<any>();
   const [liveLikes, setLiveLikes] = useState<number>(post.likesCount || 0);
   const [isProcessingLike, setIsProcessingLike] = useState(false);
 
@@ -48,7 +49,15 @@ export const PostCard = ({ post, id }: { post: any; id: any }) => {
       }
     });
   }, [user, id]);
-
+  useEffect(() => {
+    if (!user || !post.createdBy) return;
+    const savedRef = doc(db, "users", post.createdBy);
+    getDoc(savedRef).then((docSnap) => {
+      if (docSnap.exists()) {
+        setAuthorData(docSnap.data());
+      }
+    });
+  }, [user, post.createdBy]);
   useEffect(() => {
     if (!id) return;
     const unsub = onSnapshot(doc(db, "posts", id), (snap) => {
@@ -115,6 +124,8 @@ export const PostCard = ({ post, id }: { post: any; id: any }) => {
       setIsProcessingLike(false);
     }
   };
+console.log(authorData)
+  const isLocked = post.isGated && !user;
   return (
     <Box
       borderRadius="md"
@@ -131,6 +142,7 @@ export const PostCard = ({ post, id }: { post: any; id: any }) => {
         <HStack>
           <Avatar.Root colorPalette="green" variant="subtle">
             <Avatar.Fallback name="Ciro Rivieccio" />
+            <Avatar.Image src={authorData?.photoUrl}/>
             <Float placement="bottom-end" offsetX="1" offsetY="1">
               <Circle
                 bg="green.500"
@@ -140,17 +152,44 @@ export const PostCard = ({ post, id }: { post: any; id: any }) => {
               />
             </Float>
           </Avatar.Root>
-          <Text fontWeight="bold">{post.title}</Text>
+          <Text fontSize="16px" fontWeight={"bold"}>{authorData?.username}</Text>
         </HStack>
         <PostOptionsDrawer postId={id} isOwner={user?.uid === post.createdBy} />
       </HStack>
 
       {/* Media */}
       <Box w="100%" h="auto">
-        {post.mediaType === "video" ? (
-          <VideoPlayer src={post.mediaUrl} width={"100%"} />
+      {isLocked ? (
+          <>
+            <Image
+              src={post.thumbnailUrl}
+              alt="Anteprima post bloccato"
+              w="100%"
+              objectFit="cover"
+            />
+               <Center
+  position="absolute"
+  inset="0"
+  bg="rgba(0,0,0,0.5)"
+  zIndex={3}
+  flexDirection="column"
+  justifyContent="center"
+>
+  {/* Icona in alto */}
+  <LockIcon boxSize={10} color="white" mb={2} />
+
+  {/* Testo subito sotto, bianco e centrato */}
+  <Text color="white" fontSize="sm" textAlign="center" px={4}>
+    Questo contenuto è bloccato!
+    <br />
+    Per accedere al contenuto iscriviti!
+  </Text>
+</Center>
+          </>
+        ) : post.mediaType === "video" ? (
+          <VideoPlayer src={post.mediaUrl} width="100%" />
         ) : (
-          <ZoomableImage src={post.mediaUrl} alt="Post"></ZoomableImage>
+          <ZoomableImage src={post.mediaUrl} alt={post.title} />
         )}
       </Box>
 
@@ -163,6 +202,15 @@ export const PostCard = ({ post, id }: { post: any; id: any }) => {
             onClick={handleLike}
             disabled={!user || isProcessingLike}
             size="sm"
+            _hover={{
+              bg:  "red.100",
+              color: "red.600" ,
+            }}
+            _active={{
+              transform: "scale(0.8)",
+              color: "red.600" ,
+            }}
+            transition="all 0.2s"
           >
             {" "}
             <HeartIcon color={liked ? "red.500" : "black"} />
@@ -177,6 +225,15 @@ export const PostCard = ({ post, id }: { post: any; id: any }) => {
           size="sm"
           onClick={toggleSave}
           disabled={!user || saving}
+          _hover={{
+            bg:  "red.100",
+            color: "red.600" ,
+          }}
+          _active={{
+            transform: "scale(0.8)",
+            color: "red.600" ,
+          }}
+          transition="all 0.2s"
         >
           <SaveIcon color={isSaved ? "blue.500" : "black"} />
         </IconButton>
@@ -187,6 +244,7 @@ export const PostCard = ({ post, id }: { post: any; id: any }) => {
         <Text fontWeight="bold" fontSize="sm">
           {liveLikes} Mi piace
         </Text>
+        <Text fontSize="md">{post.title}</Text>
         <Text fontSize="sm">{post.description}</Text>
 
         <Text fontSize="xs" color="gray.500">

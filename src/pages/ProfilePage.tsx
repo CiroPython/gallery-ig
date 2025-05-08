@@ -16,11 +16,13 @@ import { useUser } from "../context/UserContext";
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { VerificationRequestDrawer } from "../components/VerificationRequestDrawer";
 import { FaCheckCircle } from "react-icons/fa";
+import { ShareProfileDrawer } from "../components/ShareProfileDrawer";
 const CheckIcon = chakra(FaCheckCircle as any);
 export const ProfilePage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const { user, loading: authLoading } = useUser();
   const [profileData, setProfileData] = useState<{
     username: string;
@@ -107,12 +109,19 @@ export const ProfilePage: React.FC = () => {
             size="sm"
             variant="outline"
             onClick={() => navigate("/profile/edit")}
+            _hover={{
+              bg:  "red.100",
+              color: "red.600" ,
+            }}
+            _active={{
+              transform: "scale(0.8)",
+              color: "red.600" ,
+            }}
+            transition="all 0.2s"
           >
             Modifica profilo
           </Button>
-          <Button size="sm" variant="outline">
-            Condividi profilo
-          </Button>
+         <ShareProfileDrawer postUrl={`https://ciro-ig.web.app/profile/${id}`}/>
         </HStack>
       </VStack>
 

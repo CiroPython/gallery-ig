@@ -41,11 +41,7 @@ export const AuthPage: React.FC = () => {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
-      showToast({
-        title: "Login effettuato!",
-        description: "Benvenuto a bordo.",
-        status: "success",
-      });
+
       navigate("/");
       // ← qui redirect alla home
     } catch (err: any) {
@@ -156,7 +152,7 @@ export const AuthPage: React.FC = () => {
                   Accedi
                 </Button>
 
-                <Link color="blue.500" fontSize="sm">
+                <Link color="blue.500" fontSize="sm" onClick={() => navigate("/forgot-password")}>
                   Password dimenticata?
                 </Link>
               </>

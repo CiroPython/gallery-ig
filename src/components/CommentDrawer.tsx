@@ -81,6 +81,15 @@ import {
             aria-label="Apri commenti"
             variant="ghost"
             size="sm"
+            _hover={{
+              bg:  "red.100",
+              color: "red.600" ,
+            }}
+            _active={{
+              transform: "scale(0.8)",
+              color: "red.600" ,
+            }}
+            transition="all 0.2s"
           ><CommentIcon /></IconButton>
         </Drawer.Trigger>
         <Drawer.Positioner>

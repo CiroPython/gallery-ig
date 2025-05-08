@@ -2,6 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import App from "./App";
+import "./App.css"; 
 import "react-medium-image-zoom/dist/styles.css";
 
 const container = document.getElementById("root")!;
