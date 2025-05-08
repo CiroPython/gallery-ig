@@ -110,18 +110,18 @@ export const ProfilePage: React.FC = () => {
             variant="outline"
             onClick={() => navigate("/profile/edit")}
             _hover={{
-              bg:  "red.100",
-              color: "red.600" ,
+              bg: "red.100",
+              color: "red.600",
             }}
             _active={{
               transform: "scale(0.8)",
-              color: "red.600" ,
+              color: "red.600",
             }}
             transition="all 0.2s"
           >
             Modifica profilo
           </Button>
-         <ShareProfileDrawer postUrl={`https://ciro-ig.web.app/profile/${id}`}/>
+          <ShareProfileDrawer postUrl={`https://daciro.club/profile/${id}`} />
         </HStack>
       </VStack>
 
