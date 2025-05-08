@@ -11,7 +11,7 @@ import {
   useBreakpointValue,
 } from "@chakra-ui/react";
 import { BiHomeAlt, BiSearch, BiX } from "react-icons/bi";
-import { FaBookmark, FaRegBookmark, FaUser } from "react-icons/fa";
+import { FaBookmark, FaIdCard, FaRegBookmark, FaUser } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 import { FaUserCog } from "react-icons/fa";
 
@@ -27,6 +27,8 @@ const AddIcon = chakra(AiOutlinePlusSquare as any);
 const ListIcon = chakra(FaRegRectangleList as any);
 
 const HeartIcon = chakra(FaRegBookmark as any);
+const CardIcon = chakra(FaIdCard as any);
+ 
 const SearchIcon = chakra(BiSearch as any);
 const CloseIcon = chakra(BiX as any);
 const AvatarIcon = chakra(FaUser as any);
@@ -118,6 +120,7 @@ export const AppHeader: React.FC = () => {
         ) : null}
         <>
           {profile?.uid ? (
+            <>
             <IconButton
               onClick={() => navigate("/saved")}
               aria-label="Likes"
@@ -135,6 +138,24 @@ export const AppHeader: React.FC = () => {
             >
               <HeartIcon boxSize={5} />
             </IconButton>
+            <IconButton
+              onClick={() => navigate("/request-membership")}
+              aria-label="Likes"
+              variant="ghost"
+              size="md"
+              _hover={{
+                bg:  "red.100",
+                color: "red.600" ,
+              }}
+              _active={{
+                transform: "scale(0.8)",
+                color: "red.600" ,
+              }}
+              transition="all 0.2s"
+            >
+              <CardIcon boxSize={5} />
+            </IconButton>
+            </>
           ) : null}
         </>
 

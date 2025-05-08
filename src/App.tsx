@@ -24,6 +24,8 @@ import { EditProfilePage } from "./pages/EditProfilePage";
 import { EditPostPage } from "./pages/EditPostPage";
 import { VerificationRequestsPage } from "./pages/VerificationRequestsPage";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
+import { AgeGate } from "./components/AgeGate";
+import { MembershipRequestPage } from "./pages/MembershipRequestPage";
 
 function App() {
     // 🔥 Hack iOS PWA:
@@ -36,6 +38,7 @@ function App() {
   return (
     <ChakraProvider value={defaultSystem}>
       <UserProvider>
+      <AgeGate />
         <BrowserRouter>
           {/* Header sempre visibile */}
           <AppHeader />
@@ -56,6 +59,8 @@ function App() {
               <Route path="/profile/edit" element={<EditProfilePage />} />
               <Route path="/post/:id/edit" element={<EditPostPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/request-membership" element={< MembershipRequestPage />} />
+             
               <Route
                 path="/admin/requests"
                 element={<VerificationRequestsPage />}
