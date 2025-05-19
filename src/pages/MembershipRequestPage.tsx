@@ -24,6 +24,7 @@ import {
 } from "firebase/storage";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { showToast } from "../components/Toaster";
+import { useTranslation } from "react-i18next";
 
 export const MembershipRequestPage: React.FC = () => {
   const { user, loading: authLoading } = useUser();
@@ -40,7 +41,7 @@ export const MembershipRequestPage: React.FC = () => {
   const [docFile, setDocFile] = useState<File | null>(null);
   const [docPreview, setDocPreview] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
+  const { t } = useTranslation();
   // se non loggato, forziamo il login
   useEffect(() => {
     if (!authLoading && !user) {
@@ -74,7 +75,7 @@ export const MembershipRequestPage: React.FC = () => {
       !user
     ) {
       showToast({
-        title: "Completa tutti i campi correttamente",
+        title: t("complete_field_error"),
         status: "warning",
       });
       return;
@@ -103,8 +104,8 @@ export const MembershipRequestPage: React.FC = () => {
       });
 
       showToast({
-        title: "Richiesta inviata",
-        description: "Ti contatteremo a breve.",
+        title: t("title_toast_membership"),
+        description: t("description_toast_membership"),
         status: "success",
       });
 
@@ -119,7 +120,7 @@ export const MembershipRequestPage: React.FC = () => {
     } catch (err: any) {
       showToast({
         title: "Errore",
-        description: err.message || "Impossibile inviare la richiesta.",
+        description: err.message || t("error_toast_membership"),
         status: "error",
       });
     } finally {
@@ -145,9 +146,9 @@ export const MembershipRequestPage: React.FC = () => {
 
           {/* Nome */}
           <Field.Root required>
-            <Field.Label>Nome</Field.Label>
+            <Field.Label>{t("membership.name")}</Field.Label>
             <Input
-              placeholder="Il tuo nome"
+              placeholder={t("membership.name")}
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
             />
@@ -155,9 +156,9 @@ export const MembershipRequestPage: React.FC = () => {
 
           {/* Cognome */}
           <Field.Root required>
-            <Field.Label>Cognome</Field.Label>
+            <Field.Label>{t("membership.surname")}</Field.Label>
             <Input
-              placeholder="Il tuo cognome"
+              placeholder={t("membership.surname")}
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
             />
@@ -165,7 +166,7 @@ export const MembershipRequestPage: React.FC = () => {
 
           {/* Data di nascita */}
           <Field.Root required>
-            <Field.Label>Data di Nascita</Field.Label>
+            <Field.Label>{t("membership.date_birth")}</Field.Label>
             <Input
               type="date"
               value={dob}
@@ -175,35 +176,34 @@ export const MembershipRequestPage: React.FC = () => {
 
           {/* Consumo mensile stimato */}
           <Field.Root required>
-            <Field.Label>Consumo mensile stimato (max 31 gr)</Field.Label>
+            <Field.Label>{t("membership.estimated_consumption")}</Field.Label>
             <NumberInput.Root
-  value={[estimated]}
-  onValueChange={(values: any[]) => {
-    const newValue = values[0];
-    setEstimated(newValue);
-  }}
-  max={31}
-  w="full"
->
-  <NumberInput.Control w="full">
-    <NumberInput.Input placeholder="0" />
-  </NumberInput.Control>
-  <NumberInput.Scrubber />
-</NumberInput.Root>
-
+              value={[estimated]}
+              onValueChange={(values: any[]) => {
+                const newValue = values[0];
+                setEstimated(newValue);
+              }}
+              max={31}
+              w="full"
+            >
+              <NumberInput.Control w="full" {...({} as any)}>
+                <NumberInput.Input placeholder="0" {...({} as any)} />
+              </NumberInput.Control>
+              <NumberInput.Scrubber />
+            </NumberInput.Root>
           </Field.Root>
 
           {/* Foto del Documento */}
           <Field.Root required>
-            <Field.Label>Foto del Documento</Field.Label>
+            <Field.Label>{t("membership.photo_id")}</Field.Label>
             <FileUpload.Root
               accept="image/*,application/pdf"
-              onFileAccept={({ files }:any) => setDocFile(files[0] ?? null)}
+              onFileAccept={({ files }: any) => setDocFile(files[0] ?? null)}
             >
               <FileUpload.HiddenInput />
-              <FileUpload.Trigger asChild>
+              <FileUpload.Trigger asChild {...({} as any)}>
                 <Button w="full" variant="outline">
-                  Seleziona file
+                  {t("select_file")}
                 </Button>
               </FileUpload.Trigger>
             </FileUpload.Root>
@@ -222,9 +222,9 @@ export const MembershipRequestPage: React.FC = () => {
 
           {/* Come ci hai trovati? */}
           <Field.Root required>
-            <Field.Label>Come ci hai trovati?</Field.Label>
+            <Field.Label>{t("membership.how_find_us")}</Field.Label>
             <Input
-              placeholder="Es. Social, passaparola..."
+              placeholder="Es. Social, Google..."
               value={foundVia}
               onChange={(e) => setFoundVia(e.target.value)}
             />
@@ -232,12 +232,10 @@ export const MembershipRequestPage: React.FC = () => {
 
           {/* Perché vuoi diventare membro */}
           <Field.Root required>
-            <Field.Label>
-              Perché vuoi diventare membro del nostro club?
-            </Field.Label>
+            <Field.Label>{t("membership.why_member")}</Field.Label>
             <Textarea
               resize="vertical"
-              placeholder="Scrivi qui..."
+              placeholder="Write here..."
               value={why}
               onChange={(e) => setWhy(e.target.value)}
             />
@@ -248,7 +246,7 @@ export const MembershipRequestPage: React.FC = () => {
             onClick={handleSubmit}
             loading={submitting}
           >
-            Invia Richiesta
+            {t("membership.send_request")}
           </Button>
         </VStack>
       </Box>

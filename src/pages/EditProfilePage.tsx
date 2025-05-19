@@ -2,7 +2,6 @@
 import {
   Box,
   VStack,
-  Heading,
   Input,
   Button,
   Textarea,
@@ -19,9 +18,10 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import { showToast } from "../components/Toaster";
+import { useTranslation } from "react-i18next";
 export const EditProfilePage: React.FC = () => {
   const { user } = useUser();
-
+  const { t } = useTranslation();
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
@@ -86,15 +86,17 @@ export const EditProfilePage: React.FC = () => {
   return (
     <Box maxW="md" mx="auto" py={6} px={4}>
       <VStack gap={5}>
-        <Heading size="md">Modifica profilo</Heading>
-
         <Center>
           <Avatar.Root
             size="2xl"
             cursor="pointer"
             onClick={() => fileInputRef.current?.click()}
           >
-            <Avatar.Image src={photoPreview || photoUrl} alt={username} />
+            <Avatar.Image
+              src={photoPreview || photoUrl}
+              alt={username}
+              {...({} as any)}
+            />
             <Avatar.Fallback name={username} />
           </Avatar.Root>
         </Center>
@@ -112,12 +114,12 @@ export const EditProfilePage: React.FC = () => {
           onChange={(e) => setUsername(e.target.value)}
         />
         <Textarea
-          placeholder="Biografia"
+          placeholder={t("bio_placeholder")}
           value={bio}
           onChange={(e) => setBio(e.target.value)}
         />
         <Button colorPalette="blue" onClick={handleSave} loading={loading}>
-          Salva modifiche
+          {t("save_edit_profile_button")}
         </Button>
       </VStack>
     </Box>

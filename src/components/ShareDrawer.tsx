@@ -59,8 +59,13 @@ export const ShareDrawer = ({ postUrl }: ShareDrawerProps) => {
   return (
     <Drawer.Root closeOnOutsideClick placement="bottom">
       <Drawer.Backdrop />
-      <Drawer.Trigger asChild>
-        <IconButton aria-label="Condividi" variant="ghost" size="sm">
+      <Drawer.Trigger asChild {...({} as any)}>
+        <IconButton
+          aria-label="Condividi"
+          color="white"
+          variant="ghost"
+          size="sm"
+        >
           <ShareIcon />
         </IconButton>
       </Drawer.Trigger>
@@ -71,6 +76,7 @@ export const ShareDrawer = ({ postUrl }: ShareDrawerProps) => {
           height="80vh"
           display="flex"
           flexDirection="column"
+          {...({} as any)}
         >
           <Drawer.CloseTrigger />
           <Drawer.Header borderBottomWidth="1px" textAlign="center">

@@ -8,7 +8,6 @@ import {
   Button,
   Text,
   Link,
-
 } from "@chakra-ui/react";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../firebase";
@@ -23,7 +22,7 @@ export const ForgotPasswordPage: React.FC = () => {
 
   const handleReset = async () => {
     if (!email) {
-      showToast({ title: "Inserisci la tua email", status: "error", });
+      showToast({ title: "Inserisci la tua email", status: "error" });
       return;
     }
     setLoading(true);
@@ -33,15 +32,13 @@ export const ForgotPasswordPage: React.FC = () => {
         title: "Email inviata",
         description: "Controlla la tua casella per il link di reset.",
         status: "success",
-    
       });
       navigate("/login");
     } catch (err: any) {
-        showToast({
+      showToast({
         title: "Errore",
         description: err.message || "Impossibile inviare l'email.",
         status: "error",
-
       });
     } finally {
       setLoading(false);
@@ -81,7 +78,11 @@ export const ForgotPasswordPage: React.FC = () => {
             >
               Invia link di reset
             </Button>
-            <Link color="blue.500" fontSize="sm" onClick={() => navigate("/login")}>
+            <Link
+              color="blue.500"
+              fontSize="sm"
+              onClick={() => navigate("/login")}
+            >
               Torna al login
             </Link>
           </VStack>

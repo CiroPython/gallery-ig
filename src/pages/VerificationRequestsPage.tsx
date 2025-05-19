@@ -8,7 +8,6 @@ import {
   Link,
   Button,
   Drawer,
-  chakra,
 } from "@chakra-ui/react";
 import { Table } from "@chakra-ui/react";
 import { Image } from "@chakra-ui/react";
@@ -172,7 +171,7 @@ export const VerificationRequestsPage: React.FC = () => {
       >
         <Drawer.Backdrop />
         <Drawer.Positioner>
-          <Drawer.Content borderTopRadius="2xl" maxH="60vh">
+          <Drawer.Content borderTopRadius="2xl" maxH="60vh" {...({} as any)}>
             <Drawer.CloseTrigger />
             <Drawer.Header textAlign="center" borderBottomWidth="1px">
               <Drawer.Title>Dettagli richiesta</Drawer.Title>

@@ -3,14 +3,15 @@ import {
   Drawer,
   Button,
   VStack,
-  Text,
   chakra,
   IconButton,
+  Box,
 } from "@chakra-ui/react";
 import { FaEllipsisH } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useDisclosure } from "@chakra-ui/react";
+import { forwardRef } from "react";
 
 const OptionsIcon = chakra(FaEllipsisH as any);
 
@@ -35,6 +36,17 @@ export const PostOptionsDrawer = ({ postId, isOwner }: Props) => {
   };
 
   if (!isOwner) return null;
+  // Wrapper per Drawer.Content con Chakra Box
+  const DrawerContentWrapper = forwardRef<
+    HTMLDivElement,
+    React.ComponentProps<typeof Box>
+  >(({ children, ...props }, ref) => (
+    <Drawer.Content>
+      <Box ref={ref} {...props}>
+        {children}
+      </Box>
+    </Drawer.Content>
+  ));
 
   return (
     <Drawer.Root
@@ -44,13 +56,13 @@ export const PostOptionsDrawer = ({ postId, isOwner }: Props) => {
       placement="bottom"
     >
       <Drawer.Backdrop />
-      <Drawer.Trigger asChild>
+      <Drawer.Trigger asChild {...({} as any)}>
         <IconButton aria-label="Opzioni post" variant="ghost" size="sm">
           <OptionsIcon />
         </IconButton>
       </Drawer.Trigger>
       <Drawer.Positioner>
-        <Drawer.Content
+        <DrawerContentWrapper
           borderTopRadius="xl"
           maxH="80vh"
           display="flex"
@@ -58,7 +70,9 @@ export const PostOptionsDrawer = ({ postId, isOwner }: Props) => {
         >
           <Drawer.CloseTrigger />
           <Drawer.Header borderBottomWidth="1px">
-            <Drawer.Title textAlign="center">Opzioni post</Drawer.Title>
+            <Drawer.Title textAlign="center" {...({} as any)}>
+              Opzioni post
+            </Drawer.Title>
           </Drawer.Header>
           <Drawer.Body>
             <VStack gap={4} mt={4}>
@@ -76,7 +90,7 @@ export const PostOptionsDrawer = ({ postId, isOwner }: Props) => {
               </Button>
             </VStack>
           </Drawer.Body>
-        </Drawer.Content>
+        </DrawerContentWrapper>
       </Drawer.Positioner>
     </Drawer.Root>
   );

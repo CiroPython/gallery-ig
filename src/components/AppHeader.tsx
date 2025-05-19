@@ -21,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { Button, CloseButton, Dialog, Portal } from "@chakra-ui/react";
 import { FaRegCircleUser, FaRegRectangleList } from "react-icons/fa6";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 // Wrappiamo le react-icons
 const HomeIcon = chakra(BiHomeAlt as any);
 const AddIcon = chakra(AiOutlinePlusSquare as any);
@@ -28,7 +29,7 @@ const ListIcon = chakra(FaRegRectangleList as any);
 
 const HeartIcon = chakra(FaRegBookmark as any);
 const CardIcon = chakra(FaIdCard as any);
- 
+
 const SearchIcon = chakra(BiSearch as any);
 const CloseIcon = chakra(BiX as any);
 const AvatarIcon = chakra(FaUser as any);
@@ -67,12 +68,12 @@ export const AppHeader: React.FC = () => {
           objectFit="contain"
           draggable={false}
           _hover={{
-            bg:  "red.100",
-            color: "red.600" ,
+            bg: "red.100",
+            color: "red.600",
           }}
           _active={{
             transform: "scale(0.8)",
-            color: "red.600" ,
+            color: "red.600",
           }}
           transition="all 0.2s"
         />
@@ -87,31 +88,31 @@ export const AppHeader: React.FC = () => {
             variant="ghost"
             size="md"
             _hover={{
-              bg:  "red.100",
-              color: "red.600" ,
+              bg: "red.100",
+              color: "red.600",
             }}
             _active={{
               transform: "scale(0.8)",
-              color: "red.600" ,
+              color: "red.600",
             }}
             transition="all 0.2s"
           >
             <ListIcon boxSize={6} />
           </IconButton>
         ) : null}
-        {profile?.permissions === "admin" || profile?.verified === true ? (
+        {user ? (
           <IconButton
             onClick={() => navigate("/createpost")}
             aria-label="Add"
             variant="ghost"
             size="md"
             _hover={{
-              bg:  "red.100",
-              color: "red.600" ,
+              bg: "red.100",
+              color: "red.600",
             }}
             _active={{
               transform: "scale(0.8)",
-              color: "red.600" ,
+              color: "red.600",
             }}
             transition="all 0.2s"
           >
@@ -121,40 +122,40 @@ export const AppHeader: React.FC = () => {
         <>
           {profile?.uid ? (
             <>
-            <IconButton
-              onClick={() => navigate("/saved")}
-              aria-label="Likes"
-              variant="ghost"
-              size="md"
-              _hover={{
-                bg:  "red.100",
-                color: "red.600" ,
-              }}
-              _active={{
-                transform: "scale(0.8)",
-                color: "red.600" ,
-              }}
-              transition="all 0.2s"
-            >
-              <HeartIcon boxSize={5} />
-            </IconButton>
-            <IconButton
-              onClick={() => navigate("/request-membership")}
-              aria-label="Likes"
-              variant="ghost"
-              size="md"
-              _hover={{
-                bg:  "red.100",
-                color: "red.600" ,
-              }}
-              _active={{
-                transform: "scale(0.8)",
-                color: "red.600" ,
-              }}
-              transition="all 0.2s"
-            >
-              <CardIcon boxSize={5} />
-            </IconButton>
+              <IconButton
+                onClick={() => navigate("/saved")}
+                aria-label="Likes"
+                variant="ghost"
+                size="md"
+                _hover={{
+                  bg: "red.100",
+                  color: "red.600",
+                }}
+                _active={{
+                  transform: "scale(0.8)",
+                  color: "red.600",
+                }}
+                transition="all 0.2s"
+              >
+                <HeartIcon boxSize={5} />
+              </IconButton>
+              <IconButton
+                onClick={() => navigate("/request-membership")}
+                aria-label="Likes"
+                variant="ghost"
+                size="md"
+                _hover={{
+                  bg: "red.100",
+                  color: "red.600",
+                }}
+                _active={{
+                  transform: "scale(0.8)",
+                  color: "red.600",
+                }}
+                transition="all 0.2s"
+              >
+                <CardIcon boxSize={5} />
+              </IconButton>
             </>
           ) : null}
         </>
@@ -188,7 +189,7 @@ export const AppHeader: React.FC = () => {
                       Esci
                     </Button>
                   </Dialog.Footer>
-                  <Dialog.CloseTrigger asChild>
+                  <Dialog.CloseTrigger>
                     <CloseButton size="sm" />
                   </Dialog.CloseTrigger>
                 </Dialog.Content>
@@ -205,12 +206,12 @@ export const AppHeader: React.FC = () => {
               variant="ghost"
               size="md"
               _hover={{
-                bg:  "red.100",
-                color: "red.600" ,
+                bg: "red.100",
+                color: "red.600",
               }}
               _active={{
                 transform: "scale(0.8)",
-                color: "red.600" ,
+                color: "red.600",
               }}
               transition="all 0.2s"
             >
@@ -222,12 +223,12 @@ export const AppHeader: React.FC = () => {
               variant="ghost"
               size="md"
               _hover={{
-                bg:  "red.100",
-                color: "red.600" ,
+                bg: "red.100",
+                color: "red.600",
               }}
               _active={{
                 transform: "scale(0.8)",
-                color: "red.600" ,
+                color: "red.600",
               }}
               transition="all 0.2s"
             >
@@ -241,18 +242,19 @@ export const AppHeader: React.FC = () => {
             variant="ghost"
             size="md"
             _hover={{
-              bg:  "red.100",
-              color: "red.600" ,
+              bg: "red.100",
+              color: "red.600",
             }}
             _active={{
               transform: "scale(0.8)",
-              color: "red.600" ,
+              color: "red.600",
             }}
             transition="all 0.2s"
           >
             <AvatarIcon />
           </IconButton>
         )}
+        <LanguageSwitcher />
       </HStack>
     </Flex>
   );

@@ -7,12 +7,11 @@ import {
   IconButton,
   Text,
   Box,
-  Spinner,
   chakra,
 } from "@chakra-ui/react";
 import { FaCheckCircle } from "react-icons/fa";
 import { FileUpload } from "@chakra-ui/react";
-import { getFunctions, httpsCallable } from "firebase/functions";
+
 import {
   ref as storageRef,
   uploadBytes,
@@ -34,7 +33,6 @@ const CheckIcon = chakra(FaCheckCircle as any);
 
 export const VerificationRequestDrawer: React.FC = () => {
   const { user } = useUser();
-  const functions = getFunctions();
 
   const [isOpen, setOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -111,13 +109,13 @@ export const VerificationRequestDrawer: React.FC = () => {
       closeOnOutsideClick
     >
       <Drawer.Backdrop />
-      <Drawer.Trigger asChild>
+      <Drawer.Trigger asChild {...({} as any)}>
         <IconButton aria-label="Richiedi verifica" variant="ghost" size="sm">
           <CheckIcon color="gray.400" boxSize={5} />
         </IconButton>
       </Drawer.Trigger>
       <Drawer.Positioner>
-        <Drawer.Content borderTopRadius="2xl" maxH="70vh">
+        <Drawer.Content borderTopRadius="2xl" maxH="70vh" {...({} as any)}>
           <Drawer.CloseTrigger />
           <Drawer.Header borderBottomWidth="1px" textAlign="center">
             <Drawer.Title>Verifica account</Drawer.Title>
@@ -146,7 +144,7 @@ export const VerificationRequestDrawer: React.FC = () => {
                       onFileAccept={handleFileAccept}
                     >
                       <FileUpload.HiddenInput />
-                      <FileUpload.Trigger asChild>
+                      <FileUpload.Trigger asChild {...({} as any)}>
                         <Button w="full" variant="outline">
                           Seleziona file
                         </Button>

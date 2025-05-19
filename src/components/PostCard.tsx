@@ -11,11 +11,17 @@ import {
   Float,
   Circle,
   Center,
+  Stack,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { FaHeart, FaBookmark, FaEllipsisH, FaLock } from "react-icons/fa";
-import { getRelativeTime } from "../utils/getRelativeTime";
-
-import { getFunctions, httpsCallable } from "firebase/functions";
+import {
+  FaHeart,
+  FaBookmark,
+  FaEllipsisH,
+  FaLock,
+  FaRegComment,
+  FaExpand,
+} from "react-icons/fa";
 import { useUser } from "../context/UserContext";
 import { useEffect, useState } from "react";
 import {
@@ -27,102 +33,91 @@ import {
   deleteDoc,
   setDoc,
 } from "firebase/firestore";
-
-import { db } from "../firebase"; // o da dove importi il db
+import { db } from "../firebase";
 import { CommentDrawer } from "./CommentDrawer";
-import { ShareDrawer } from "./ShareDrawer";
+
 import { PostOptionsDrawer } from "./PostOptionsDrawer";
 import { VideoPlayer } from "./VideoPlayer";
 import { ZoomableImage } from "./ZoomableImage";
+import { getRelativeTime } from "../utils/getRelativeTime";
+import { useNavigate } from "react-router-dom";
+
 const HeartIcon = chakra(FaHeart as any);
 const SaveIcon = chakra(FaBookmark as any);
-const OptionsIcon = chakra(FaEllipsisH as any);
+const ExpandIcon = chakra(FaExpand as any);
 const LockIcon = chakra(FaLock as any);
+const CommentIcon = chakra(FaRegComment as any);
 export const PostCard = ({ post, id }: { post: any; id: any }) => {
   const { user } = useUser();
   const [liked, setLiked] = useState(false);
-
   const [isSaved, setIsSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [authorData, setAuthorData] = useState<any>();
   const [liveLikes, setLiveLikes] = useState<number>(post.likesCount || 0);
   const [isProcessingLike, setIsProcessingLike] = useState(false);
-
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const { open, onOpen, onClose } = useDisclosure();
+  const navigate = useNavigate();
+  const descriptionPreviewLimit = 80;
+  const isDescriptionLong = post.description?.length > descriptionPreviewLimit;
+  const displayedDescription = showFullDescription
+    ? post.description
+    : post.description?.slice(0, descriptionPreviewLimit);
   useEffect(() => {
     if (!user || !id) return;
     const savedRef = doc(db, "users", user.uid, "savedPosts", id);
     getDoc(savedRef).then((docSnap) => {
-      if (docSnap.exists()) {
-        setIsSaved(true);
-      }
+      if (docSnap.exists()) setIsSaved(true);
     });
   }, [user, id]);
+
   useEffect(() => {
     if (!user || !post.createdBy) return;
     const savedRef = doc(db, "users", post.createdBy);
     getDoc(savedRef).then((docSnap) => {
-      if (docSnap.exists()) {
-        setAuthorData(docSnap.data());
-      }
+      if (docSnap.exists()) setAuthorData(docSnap.data());
     });
   }, [user, post.createdBy]);
+
   useEffect(() => {
     if (!id) return;
     const unsub = onSnapshot(doc(db, "posts", id), (snap) => {
       const data = snap.data();
-      if (data?.likesCount !== undefined) {
-        setLiveLikes(data.likesCount);
-      }
+      if (data?.likesCount !== undefined) setLiveLikes(data.likesCount);
     });
     return () => unsub();
   }, [id]);
 
   useEffect(() => {
     if (!user || !id) return;
-
     const likeDocRef = doc(db, "posts", id, "likes", user.uid);
     getDoc(likeDocRef).then((docSnap) => {
-      if (docSnap.exists()) {
-        setLiked(true);
-      }
+      if (docSnap.exists()) setLiked(true);
     });
   }, [user, id]);
 
   const toggleSave = async () => {
     if (!user || saving) return;
     setSaving(true);
-
-    // optimistic UI
     setIsSaved((prev) => !prev);
-
     const saveRef = doc(db, "users", user.uid, "savedPosts", id);
-
     try {
-      if (isSaved) {
-        // togli dai preferiti
-        await deleteDoc(saveRef);
-      } else {
-        // salva come preferito
-        await setDoc(saveRef, { savedAt: serverTimestamp() });
-      }
+      if (isSaved) await deleteDoc(saveRef);
+      else await setDoc(saveRef, { savedAt: serverTimestamp() });
     } catch (err) {
-      console.error("Errore save client-side:", err);
-      // rollback UI
       setIsSaved((prev) => !prev);
+      console.error("Errore save client-side:", err);
       alert("Non ho potuto aggiornare i preferiti, riprova.");
     } finally {
       setSaving(false);
     }
   };
 
-  // Funzione "like" client-side con batch + optimistic UI
   const handleLike = async () => {
     if (!user || isProcessingLike) return;
     setIsProcessingLike(true);
-
-    // optimistic UI
     setLiked((prev) => !prev);
-    setLiveLikes((c) => c + (liked ? -1 : +1));
+    setLiveLikes((c) => c + (liked ? -1 : 1));
 
     try {
       const batch = writeBatch(db);
@@ -139,11 +134,9 @@ export const PostCard = ({ post, id }: { post: any; id: any }) => {
 
       await batch.commit();
     } catch (err) {
-      console.log(err);
-      console.error("Errore like:", err);
-      // rollback
       setLiked((prev) => !prev);
-      setLiveLikes((c) => c + (liked ? +1 : -1));
+      setLiveLikes((c) => c + (liked ? 1 : -1));
+      console.error("Errore like:", err);
       alert("Non ho potuto aggiornare il like, riprova.");
     } finally {
       setIsProcessingLike(false);
@@ -151,6 +144,88 @@ export const PostCard = ({ post, id }: { post: any; id: any }) => {
   };
 
   const isLocked = post.isGated && !user;
+
+  // Style Reels if it's a video
+  if (post.mediaType === "video") {
+    return (
+      <Box position="relative" w="100%" h="100vh" overflow="hidden" bg="black">
+        <VideoPlayer src={post.mediaUrl} />
+        <Stack
+          position="absolute"
+          right={4}
+          top="50%"
+          transform="translateY(-50%)"
+          gap={4}
+          align="center"
+          zIndex={2}
+        >
+          <IconButton
+            aria-label="Like"
+            variant="ghost"
+            onClick={handleLike}
+            disabled={!user || isProcessingLike}
+            size="lg"
+          >
+            <HeartIcon color={liked ? "red.500" : "white"} boxSize={6} />
+          </IconButton>
+          <Text mt="-6" fontSize="10px" color="white">
+            {liveLikes} Mi piace
+          </Text>
+          <IconButton
+            aria-label="Commenta"
+            variant="ghost"
+            onClick={onOpen}
+            size="lg"
+            color="white"
+          >
+            <CommentIcon />
+          </IconButton>
+        </Stack>
+
+        <Box position="absolute" bottom={8} left={4} zIndex={2} color="white">
+          <HStack>
+            <Avatar.Root size={"sm"}>
+              <Avatar.Fallback name="Segun Adebayo" />
+              <Avatar.Image
+                onClick={() => navigate(`/profile/${post?.createdBy}`)}
+                src={authorData?.photoUrl}
+                {...({} as any)}
+              />
+            </Avatar.Root>
+
+            <Text
+              fontWeight="bold"
+              onClick={() => navigate(`/profile/${post?.createdBy}`)}
+            >
+              {authorData?.username}
+            </Text>
+          </HStack>
+          <Text mt={1}>{post.title}</Text>
+          <Text mt={1} fontSize={"14px"}>
+            {displayedDescription}
+            {isDescriptionLong && (
+              <Text
+                as="span"
+                color="gray.300"
+                cursor="pointer"
+                onClick={() => setShowFullDescription(!showFullDescription)}
+              >
+                {" "}
+                {showFullDescription ? "..Mostra meno" : "...Altro"}
+              </Text>
+            )}
+          </Text>
+          <Text fontSize="xs" color="gray.300">
+            {post.createdAt?.seconds &&
+              getRelativeTime(new Date(post.createdAt.seconds * 1000))}
+          </Text>
+        </Box>
+        <CommentDrawer postId={id} isOpen={open} onClose={onClose} />
+      </Box>
+    );
+  }
+
+  // Standard layout for images
   return (
     <Box
       borderRadius="md"
@@ -160,125 +235,93 @@ export const PostCard = ({ post, id }: { post: any; id: any }) => {
       mx="auto"
       mb={6}
       overflow="hidden"
-      pt={{ base: "26px", md: "30px" }}
     >
-      {/* Header */}
       <HStack justify="space-between" px={4} py={3}>
         <HStack>
-          <Avatar.Root colorPalette="green" variant="subtle">
-            <Avatar.Fallback name="Ciro Rivieccio" />
-            <Avatar.Image src={authorData?.photoUrl} />
-            <Float placement="bottom-end" offsetX="1" offsetY="1">
-              <Circle
-                bg="green.500"
-                size="8px"
-                outline="0.2em solid"
-                outlineColor="bg"
-              />
-            </Float>
+          <Avatar.Root size={"sm"}>
+            <Avatar.Fallback name="Segun Adebayo" />
+            <Avatar.Image
+              onClick={() => navigate(`/profile/${post?.createdBy}`)}
+              src={authorData?.photoUrl}
+              {...({} as any)}
+            />
           </Avatar.Root>
-          <Text fontSize="16px" fontWeight={"bold"}>
+
+          <Text
+            onClick={() => navigate(`/profile/${post?.createdBy}`)}
+            fontWeight="bold"
+          >
             {authorData?.username}
           </Text>
         </HStack>
         <PostOptionsDrawer postId={id} isOwner={user?.uid === post.createdBy} />
       </HStack>
 
-      {/* Media */}
       <Box w="100%" h="auto">
         {isLocked ? (
-          <>
-            <Image
-              src={post.thumbnailUrl}
-              alt="Anteprima post bloccato"
-              w="100%"
-              objectFit="cover"
-            />
-            <Center
-              position="absolute"
-              inset="0"
-              bg="rgba(0, 0, 0, 0.78)"
-              zIndex={3}
-              flexDirection="column"
-              justifyContent="center"
-            >
-              {/* Icona in alto */}
-              <LockIcon boxSize={10} color="white" mb={2} />
-
-              {/* Testo subito sotto, bianco e centrato */}
-              <Text color="white" fontSize="sm" textAlign="center" px={4}>
-                Questo contenuto è bloccato!
-                <br />
-                Per accedere al contenuto iscriviti!
-              </Text>
-            </Center>
-          </>
-        ) : post.mediaType === "video" ? (
-          <VideoPlayer src={post.mediaUrl} width="100%" />
+          <Center
+            position="relative"
+            w="100%"
+            h="auto"
+            bg="blackAlpha.700"
+            flexDir="column"
+          >
+            <LockIcon boxSize={10} color="white" mb={2} />
+            <Text color="white" fontSize="sm" textAlign="center" px={4}>
+              Questo contenuto è bloccato!
+              <br />
+              Per accedere al contenuto iscriviti!
+            </Text>
+          </Center>
         ) : (
           <ZoomableImage src={post.mediaUrl} alt={post.title} />
         )}
       </Box>
 
-      {/* Actions */}
       <HStack justify="space-between" px={4} py={2}>
-        <HStack gap={2}>
+        <HStack>
           <IconButton
             aria-label="Like"
             variant="ghost"
             onClick={handleLike}
             disabled={!user || isProcessingLike}
             size="sm"
-            _hover={{
-              bg: "red.100",
-              color: "red.600",
-            }}
-            _active={{
-              transform: "scale(0.8)",
-              color: "red.600",
-            }}
-            transition="all 0.2s"
           >
-            {" "}
             <HeartIcon color={liked ? "red.500" : "black"} />
           </IconButton>
-
-          <CommentDrawer postId={id} />
-          <ShareDrawer postUrl={`https://daciro.club/posts/${id}`} />
+          <IconButton
+            aria-label="Commenta"
+            variant="ghost"
+            onClick={onOpen}
+            size="lg"
+            color="black"
+          >
+            <CommentIcon />
+          </IconButton>
         </HStack>
         <IconButton
-          aria-label="Salva"
+          aria-label="Save"
           variant="ghost"
           size="sm"
           onClick={toggleSave}
           disabled={!user || saving}
-          _hover={{
-            bg: "red.100",
-            color: "red.600",
-          }}
-          _active={{
-            transform: "scale(0.8)",
-            color: "red.600",
-          }}
-          transition="all 0.2s"
         >
           <SaveIcon color={isSaved ? "blue.500" : "black"} />
         </IconButton>
       </HStack>
 
-      {/* Description */}
-      <VStack px={4} align="start" gap={1} pb={3}>
+      <VStack px={4} align="start" pb={3}>
         <Text fontWeight="bold" fontSize="sm">
           {liveLikes} Mi piace
         </Text>
         <Text fontSize="md">{post.title}</Text>
         <Text fontSize="sm">{post.description}</Text>
-
         <Text fontSize="xs" color="gray.500">
           {post.createdAt?.seconds &&
             getRelativeTime(new Date(post.createdAt.seconds * 1000))}
         </Text>
       </VStack>
+      <CommentDrawer postId={id} isOpen={open} onClose={onClose} />
     </Box>
   );
 };

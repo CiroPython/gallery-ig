@@ -1,26 +1,13 @@
 // src/components/ShareDrawer.tsx
-import {
-  Drawer,
-  Button,
-  chakra,
-  VStack,
-  IconButton,
-  Text,
-} from "@chakra-ui/react";
-import {
-  FaInstagram,
-  FaFacebook,
-  FaWhatsapp,
-  FaTwitter,
-  FaPaperPlane,
-} from "react-icons/fa";
+import { Drawer, Button, chakra, VStack } from "@chakra-ui/react";
+import { FaInstagram, FaFacebook, FaWhatsapp, FaTwitter } from "react-icons/fa";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const InstagramIcon = chakra(FaInstagram as any);
 const FacebookIcon = chakra(FaFacebook as any);
 const WhatsappIcon = chakra(FaWhatsapp as any);
 const TwitterIcon = chakra(FaTwitter as any);
-const ShareIcon = chakra(FaPaperPlane as any);
 
 interface ShareDrawerProps {
   postUrl: string;
@@ -28,7 +15,7 @@ interface ShareDrawerProps {
 
 export const ShareProfileDrawer = ({ postUrl }: ShareDrawerProps) => {
   const [open, setOpen] = useState(false);
-
+  const { t } = useTranslation();
   const shareOptions = [
     {
       label: "Instagram",
@@ -59,11 +46,10 @@ export const ShareProfileDrawer = ({ postUrl }: ShareDrawerProps) => {
   return (
     <Drawer.Root closeOnOutsideClick placement="bottom">
       <Drawer.Backdrop />
-      <Drawer.Trigger asChild>
-       
+      <Drawer.Trigger asChild {...({} as any)}>
         <Button aria-label="Condividi" size="sm" variant="outline">
-            Condividi profilo
-          </Button>
+          {t("share_profile_button")}
+        </Button>
       </Drawer.Trigger>
 
       <Drawer.Positioner>
@@ -72,10 +58,11 @@ export const ShareProfileDrawer = ({ postUrl }: ShareDrawerProps) => {
           height="80vh"
           display="flex"
           flexDirection="column"
+          {...({} as any)}
         >
           <Drawer.CloseTrigger />
           <Drawer.Header borderBottomWidth="1px" textAlign="center">
-            <Drawer.Title>Condividi il tuo profilo</Drawer.Title>
+            <Drawer.Title> {t("share_profile_button")}</Drawer.Title>
           </Drawer.Header>
 
           <Drawer.Body flex="1" py={6}>

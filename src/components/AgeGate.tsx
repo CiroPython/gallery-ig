@@ -1,13 +1,13 @@
 // src/components/AgeGate.tsx
-import React, { useEffect, useState } from "react";
+import React, { forwardRef, useEffect, useState } from "react";
 import {
   Dialog,
   Portal,
   Button,
   Text,
   HStack,
-  VStack,
   chakra,
+  Box,
 } from "@chakra-ui/react";
 
 // La radice del Dialog
@@ -33,6 +33,16 @@ export const AgeGate: React.FC = () => {
     // reindirizza lontano dal sito
     window.location.href = "https://www.google.com/";
   };
+  const DialogContentWrapper = forwardRef<
+    HTMLDivElement,
+    React.ComponentProps<typeof Box>
+  >(({ children, ...props }, ref) => (
+    <Dialog.Content>
+      <Box ref={ref} {...props}>
+        {children}
+      </Box>
+    </Dialog.Content>
+  ));
 
   return (
     <AgeDialog open={isOpen} onOpenChange={(o: any) => !o && setIsOpen(true)}>
@@ -40,7 +50,7 @@ export const AgeGate: React.FC = () => {
 
       <Portal>
         <Dialog.Positioner>
-          <Dialog.Content
+          <DialogContentWrapper
             bg="white"
             borderRadius="lg"
             maxW="xs"
@@ -56,7 +66,8 @@ export const AgeGate: React.FC = () => {
             </Dialog.Header>
             <Dialog.Body>
               <Text mb={6}>
-                Devi avere almeno <strong>18 anni</strong> per accedere a questo sito.
+                Devi avere almeno <strong>18 anni</strong> per accedere a questo
+                sito.
               </Text>
               <HStack gap={4} justify="center">
                 <Button colorScheme="teal" onClick={handleYes}>
@@ -67,7 +78,7 @@ export const AgeGate: React.FC = () => {
                 </Button>
               </HStack>
             </Dialog.Body>
-          </Dialog.Content>
+          </DialogContentWrapper>
         </Dialog.Positioner>
       </Portal>
     </AgeDialog>

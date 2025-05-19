@@ -21,9 +21,11 @@ import {
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export const AuthPage: React.FC = () => {
   // toggle login / register
+  const { t } = useTranslation();
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -58,8 +60,8 @@ export const AuthPage: React.FC = () => {
   const handleRegister = async () => {
     if (regPassword !== regConfirm) {
       showToast({
-        title: "Password!",
-        description: "Le password non coincidono.",
+        title: t("password"),
+        description: t("toast.wrong_password"),
         status: "error",
       });
       return;
@@ -67,7 +69,7 @@ export const AuthPage: React.FC = () => {
     if (!regUsername) {
       showToast({
         title: "Username",
-        description: "Inserisci uno username",
+        description: t("toast.insert_username"),
         status: "error",
       });
       return;
@@ -91,7 +93,7 @@ export const AuthPage: React.FC = () => {
 
       showToast({
         title: "ok",
-        description: "Registrazione avvenuta!",
+        description: t("toast.signup_success"),
         status: "success",
       });
       setIsRegister(false);
@@ -124,7 +126,7 @@ export const AuthPage: React.FC = () => {
             {!isRegister ? (
               <>
                 <Input
-                  placeholder="Email"
+                  placeholder={t("email")}
                   type="email"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
@@ -133,7 +135,7 @@ export const AuthPage: React.FC = () => {
                   bg="gray.100"
                 />
                 <Input
-                  placeholder="Password"
+                  placeholder={t("password")}
                   type="password"
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
@@ -147,13 +149,17 @@ export const AuthPage: React.FC = () => {
                   size="lg"
                   onClick={handleLogin}
                   loading={loading}
-                  loadingText="Accedi"
+                  loadingText={t("enter_button")}
                 >
-                  Accedi
+                  {t("enter_button")}
                 </Button>
 
-                <Link color="blue.500" fontSize="sm" onClick={() => navigate("/forgot-password")}>
-                  Password dimenticata?
+                <Link
+                  color="blue.500"
+                  fontSize="sm"
+                  onClick={() => navigate("/forgot-password")}
+                >
+                  {t("lost_password")}
                 </Link>
               </>
             ) : (
@@ -167,7 +173,7 @@ export const AuthPage: React.FC = () => {
                   bg="gray.100"
                 />
                 <Input
-                  placeholder="Email"
+                  placeholder={t("email")}
                   type="email"
                   value={regEmail}
                   onChange={(e) => setRegEmail(e.target.value)}
@@ -176,7 +182,7 @@ export const AuthPage: React.FC = () => {
                   bg="gray.100"
                 />
                 <Input
-                  placeholder="Password"
+                  placeholder={t("password")}
                   type="password"
                   value={regPassword}
                   onChange={(e) => setRegPassword(e.target.value)}
@@ -185,7 +191,7 @@ export const AuthPage: React.FC = () => {
                   bg="gray.100"
                 />
                 <Input
-                  placeholder="Conferma Password"
+                  placeholder={t("confirm_password")}
                   type="password"
                   value={regConfirm}
                   onChange={(e) => setRegConfirm(e.target.value)}
@@ -199,9 +205,9 @@ export const AuthPage: React.FC = () => {
                   size="lg"
                   onClick={handleRegister}
                   loading={loading}
-                  loadingText="Iscrizione..."
+                  loadingText={t("register_button")}
                 >
-                  Iscriviti
+                  {t("register_button")}
                 </Button>
               </>
             )}
@@ -213,16 +219,16 @@ export const AuthPage: React.FC = () => {
           <Text textAlign="center" fontSize="md">
             {!isRegister ? (
               <>
-                Non hai un account?{" "}
+                {t("no_account")}
                 <Link color="blue.500" onClick={() => setIsRegister(true)}>
-                  Iscriviti
+                  {t("no_account_button")}
                 </Link>
               </>
             ) : (
               <>
-                Hai già un account?{" "}
+                {t("already_member")}{" "}
                 <Link color="blue.500" onClick={() => setIsRegister(false)}>
-                  Accedi
+                  {t("already_member_button")}
                 </Link>
               </>
             )}

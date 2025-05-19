@@ -169,7 +169,7 @@ export const EditPostPage: React.FC = () => {
               }}
             >
               <FileUpload.HiddenInput />
-              <FileUpload.Trigger asChild>
+              <FileUpload.Trigger asChild {...({} as any)}>
                 <Button variant="outline" size="md">
                   <Icon as={LuFileIcon} /> Seleziona file
                 </Button>
@@ -189,7 +189,7 @@ export const EditPostPage: React.FC = () => {
                 }}
               >
                 <FileUpload.HiddenInput />
-                <FileUpload.Trigger asChild>
+                <FileUpload.Trigger asChild {...({} as any)}>
                   <Button variant="outline" size="md">
                     <Icon as={LuFileIcon} /> Seleziona thumbnail
                   </Button>

@@ -12,14 +12,7 @@ import { FaVideo, FaImage, FaLock } from "react-icons/fa";
 import { useUser } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import {
-  collection,
-  getDocs,
-  doc,
-  getDoc,
-  query,
-  orderBy,
-} from "firebase/firestore";
+import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { Post } from "../data";
 

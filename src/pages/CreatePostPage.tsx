@@ -1,7 +1,6 @@
 // src/pages/CreatePostPage.tsx
 import React, { useEffect, useState } from "react";
 import {
-  Center,
   Box,
   Heading,
   VStack,
@@ -11,16 +10,12 @@ import {
   Button,
   Spinner,
   FileUpload,
-  Float,
-  useFileUploadContext,
   chakra,
-  useFileUpload,
-  Flex,
   Image,
   Icon,
   Text,
 } from "@chakra-ui/react";
-import { LuFileImage, LuX } from "react-icons/lu";
+import { LuFileImage } from "react-icons/lu";
 import { showToast } from "../components/Toaster"; // nostro toaster custom
 import { useUser } from "../context/UserContext";
 import { storage, db } from "../firebase";
@@ -33,7 +28,8 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 
 // Importiamo il composable Field (sostituto di FormControl/FormLabel)
 import { Field } from "@chakra-ui/react";
-const LuXIcon = chakra(LuX as any);
+import { useTranslation } from "react-i18next";
+
 const LuFileIcon = chakra(LuFileImage as any);
 // Preview + delete per FileUpload
 
@@ -49,7 +45,7 @@ export const CreatePostPage: React.FC = () => {
   const [thumbnailUrl, setThumbnailUrl] = useState<string>("");
   // 1) Start the FileUpload store (max 1 file)
   // quando FileUpload.Root invoca onChange
-
+  const { t } = useTranslation();
   // genera preview ogni volta che fileBlob cambia
   useEffect(() => {
     if (!fileBlob) {
@@ -150,45 +146,46 @@ export const CreatePostPage: React.FC = () => {
       <Box w="full" maxW="md" bg="white" p={6} boxShadow="md" borderRadius="lg">
         <VStack gap={4} align="stretch">
           <Heading size="md" textAlign="center">
-            Crea un nuovo post
+            {t("create_new_post_title")}
           </Heading>
 
           {/* Upload immagine/video */}
           <Field.Root>
-            <Field.Label>Immagine o Video *</Field.Label>
+            <Field.Label> {t("image_or_video")}</Field.Label>
 
             <FileUpload.Root
               accept="image/*,video/*"
               onFileAccept={handleFileChange}
             >
               <FileUpload.HiddenInput />
-              <FileUpload.Trigger asChild>
+              <FileUpload.Trigger asChild {...({} as any)}>
                 <Button variant="outline" size="md">
-                  <Icon as={LuFileIcon}></Icon>Seleziona file
+                  <Icon as={LuFileIcon}></Icon>
+                  {t("select_file")}
                 </Button>
               </FileUpload.Trigger>
               {fileBlob && (
-                      <Box
-                        mt={3}
-                        p={3}
-                        borderWidth="1px"
-                        borderRadius="md"
-                        bg="gray.50"
-                        fontSize="sm"
-                        textAlign="left"
-                        wordBreak="break-all"
-                      >
-                        <Text>
-                          {fileBlob.type.startsWith("video/")
-                            ? "🎥 Video:"
-                            : "🖼️ Immagine:"}{" "}
-                          <strong>{fileBlob.name}</strong>
-                        </Text>
-                        <Text color="gray.500" fontSize="xs">
-                          {Math.round(fileBlob.size / 1024)} KB
-                        </Text>
-                      </Box>
-                    )}
+                <Box
+                  mt={3}
+                  p={3}
+                  borderWidth="1px"
+                  borderRadius="md"
+                  bg="gray.50"
+                  fontSize="sm"
+                  textAlign="left"
+                  wordBreak="break-all"
+                >
+                  <Text>
+                    {fileBlob.type.startsWith("video/")
+                      ? "🎥 Video:"
+                      : "🖼️ Immagine:"}{" "}
+                    <strong>{fileBlob.name}</strong>
+                  </Text>
+                  <Text color="gray.500" fontSize="xs">
+                    {Math.round(fileBlob.size / 1024)} KB
+                  </Text>
+                </Box>
+              )}
               {fileBlob?.type.startsWith("video/") && (
                 <Field.Root required>
                   <Field.Label>Anteprima del video *</Field.Label>
@@ -202,13 +199,12 @@ export const CreatePostPage: React.FC = () => {
                     }}
                   >
                     <FileUpload.HiddenInput />
-                    
-                    <FileUpload.Trigger asChild>
+
+                    <FileUpload.Trigger asChild {...({} as any)}>
                       <Button variant="outline" size="md">
-                        <Icon as={LuFileIcon} /> Seleziona immagine
+                        <Icon as={LuFileIcon} /> {t("select_image")}
                       </Button>
                     </FileUpload.Trigger>
-             
                   </FileUpload.Root>
 
                   {thumbnailUrl && (
@@ -242,9 +238,9 @@ export const CreatePostPage: React.FC = () => {
 
           {/* Titolo */}
           <Field.Root required>
-            <Field.Label>Titolo *</Field.Label>
+            <Field.Label>{t("title_post")} *</Field.Label>
             <Input
-              placeholder="Titolo del post"
+              placeholder={t("title_post")}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -252,9 +248,9 @@ export const CreatePostPage: React.FC = () => {
 
           {/* Descrizione */}
           <Field.Root>
-            <Field.Label>Descrizione *</Field.Label>
+            <Field.Label>{t("description_post")} *</Field.Label>
             <Textarea
-              placeholder="Descrivi il post…"
+              placeholder={t("description_post")}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               resize="vertical"
@@ -271,7 +267,7 @@ export const CreatePostPage: React.FC = () => {
             >
               <Switch.HiddenInput />
               <Switch.Control />
-              <Switch.Label>Solo utenti registrati</Switch.Label>
+              <Switch.Label>{t("only_member_switch")}</Switch.Label>
             </Switch.Root>
           </Field.Root>
 
@@ -281,7 +277,7 @@ export const CreatePostPage: React.FC = () => {
             onClick={handleSubmit}
             loading={uploading}
           >
-            Crea Post
+            {t("create_post_button")}
           </Button>
         </VStack>
       </Box>
